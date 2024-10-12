@@ -11,6 +11,7 @@ namespace NeuralNetworks
         string Target;
         string randomString;
         Random random;
+        //convert ints to chars
         public HillClimber(string target, Random ran)
         {
             Target = target;
