@@ -18,23 +18,32 @@ namespace NeuralNetworks
             random = ran;
             for(int i = 0; i < Target.Length; i++)
             {
-                randomString += random.Next(32, 127);
+                randomString += (char)random.Next(32, 127);
             }
         }
 
         public string Run()
         {
-            while(GetError() != 0)
+            while (GetError() != 0)
             {
+                double tempError = GetError();
+                string tempString = randomString;
                 Mutate();
+
+                if(tempError < GetError())
+                {
+                    randomString = tempString;
+                }
             }
+
+            
 
             return randomString;
         }
 
         private double GetError()
         {
-            int error = 0;
+            double error = 0;
             for(int i = 0; i < Target.Length; i++)
             {
                 error += Math.Abs(Target[i] - randomString[i]);
@@ -65,6 +74,8 @@ namespace NeuralNetworks
                     sb[random.Next(Target.Length)]--;
                 }
             }
+
+            randomString = sb.ToString();
 
         }
     }
