@@ -54,8 +54,8 @@ namespace HillClimberBestFit
             if (ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released)
             {
                 points.Add(new Point(ms.X, ms.Y));
-                line.Run();
             }
+                line.Run();
 
 
             previousMs = ms;
@@ -68,9 +68,10 @@ namespace HillClimberBestFit
 
             spriteBatch.Begin();
 
-            spriteBatch.DrawLine(new (200, 0), new(200, 800), Color.Black, 3);
-            spriteBatch.DrawLine(new(0, 600), new(1000, 600), Color.Black, 3);
-            spriteBatch.DrawLine(line.intercept.ToVector2(), 4000f, line.slope, Color.Black);
+            //spriteBatch.DrawLine(new(200, 0), new(200, 800), Color.Black, 3);
+            //spriteBatch.DrawLine(new(0, 600), new(1000, 600), Color.Black, 3);
+            spriteBatch.DrawLine(new(0, line.intercept), 4000f, line.slope, Color.Black);
+            Window.Title = $"{line.GetError()}";
 
 
             foreach (var point in points)

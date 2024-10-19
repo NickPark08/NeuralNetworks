@@ -13,22 +13,25 @@ namespace HillClimberBestFit
     {
         List<Point> Target;
         Random random;
-        public Point intercept;
+        public int intercept;
         public float slope;
+        public float mRate = 0.001f;
+        public int bRate = 1;
 
         public HillClimberLine(List<Point> target, Random ran)
         {
             Target = target;
             random = ran;
-            intercept = new Point();
+            intercept = 0;
             slope = 0;
         }
 
         public void Run()
         {
-            while (GetError() <= 0.5f)
+            int count = 0;
+            while (count < 10)
             {
-                Point tempInt = intercept;
+                int tempInt = intercept;
                 float tempSlope = slope;
                 double tempError = GetError();
                 Mutate();
@@ -38,42 +41,43 @@ namespace HillClimberBestFit
                     slope = tempSlope;
                     intercept = tempInt;
                 }
+                count++;
             }
 
         }
 
-        public void Mutate()
+        private void Mutate()
         {
             if (random.Next(2) == 0)
             {
                 if(random.Next(2) == 0)
                 {
-                    slope++;
+                    slope += mRate;
                 }
                 else
                 {
-                    slope--;
+                    slope -= mRate;
                 }
             }
             else
             {
                 if(random.Next(2) == 0)
                 {
-                    intercept.Y++;
+                    intercept += bRate;
                 }
                 else
                 {
-                    intercept.Y--;
+                    intercept -= bRate;
                 }
             }
         }
 
-        private double GetError()
+        public double GetError()
         {
             double error = 0;
             foreach(var point in Target)
             {
-                error += Math.Abs(point.Y - (slope * point.X + intercept.Y));
+                error += Math.Pow((slope * point.X + intercept) - point.Y, 2);
             }
 
             return error / Target.Count();

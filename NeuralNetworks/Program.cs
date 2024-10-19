@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Net;
 
 namespace NeuralNetworks
 {
@@ -7,9 +8,14 @@ namespace NeuralNetworks
         static void Main(string[] args)
         {
             Random random = new Random();
-            HillClimber climber = new HillClimber("hello world", random);
+            double[] weights = { .75, -1.25 };
+            double[][] inputs = [ [0,0], [.3, -.7], [1, 1], [-1, -1], [-.5, .5] ];
+            Perceptron perceptron = new Perceptron(weights, .5);
 
-            Console.WriteLine(climber.Run());
+            foreach (var val in perceptron.Compute(inputs))
+            {
+                Console.WriteLine(val);
+            }
         }
     }
 }
