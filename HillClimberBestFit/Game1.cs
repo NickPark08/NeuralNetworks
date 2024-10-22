@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Emit;
 
 namespace HillClimberBestFit
@@ -16,6 +17,13 @@ namespace HillClimberBestFit
         private List<Point> points;
         HillClimberLine line;
         private Random random;
+        PerceptronBestFitLine perceptronLine;
+        Func<double, double, double> errorFunc;
+        int averageX;
+        int averageY;
+        Point initialPoint;
+        float slope;
+        float yIntercept;
 
         public Game1()
         {
@@ -23,6 +31,7 @@ namespace HillClimberBestFit
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
+
 
         protected override void Initialize()
         {
@@ -33,9 +42,16 @@ namespace HillClimberBestFit
             points = new List<Point>();
             random = new Random();
             line = new HillClimberLine(points, random);
+            errorFunc = ErrorFunc;
+            perceptronLine = new PerceptronBestFitLine(points.Count(), 0.1, random, errorFunc);
 
 
             base.Initialize();
+        }
+
+        private double ErrorFunc(double actual, double desired)
+        {
+            return Math.Pow(desired - actual, 2);
         }
 
         protected override void LoadContent()
@@ -51,12 +67,28 @@ namespace HillClimberBestFit
                 Exit();
 
             MouseState ms = Mouse.GetState();
-            if (ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released)
+            if (ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released && IsActive)
             {
                 points.Add(new Point(ms.X, ms.Y));
             }
-                line.Run();
 
+
+        if (points.Count() > 1)
+            {
+                averageY = 0;
+                averageX = 0;
+                initialPoint = points[0];
+                foreach (var point in points)
+                {
+                    averageX += point.X;
+                    averageY += point.Y;
+                }
+                averageX /= points.Count();
+                averageY /= points.Count();
+                slope = (float)(averageY - initialPoint.Y) / (averageX - initialPoint.X);
+                //y = mx + b -> b = y - mx
+                yIntercept = averageY - (slope * averageX);
+            }
 
             previousMs = ms;
             base.Update(gameTime);
@@ -66,11 +98,17 @@ namespace HillClimberBestFit
         {
             GraphicsDevice.Clear(Color.White);
 
+            //manual best fit
+            //initial point, averaged point, calcultae line
+
+
             spriteBatch.Begin();
 
-            //spriteBatch.DrawLine(new(200, 0), new(200, 800), Color.Black, 3);
-            //spriteBatch.DrawLine(new(0, 600), new(1000, 600), Color.Black, 3);
-            spriteBatch.DrawLine(new(0, line.intercept), 4000f, line.slope, Color.Black);
+            if(points.Count() > 1)
+            {
+                spriteBatch.DrawLine(new(0, yIntercept), 4000f, slope, Color.Black);
+            }
+
             Window.Title = $"{line.GetError()}";
 
 

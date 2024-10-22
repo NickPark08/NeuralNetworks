@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNetworks
+namespace HillClimberBestFit
 {
-    internal class Perceptron
+    internal class PerceptronBestFitLine
     {
         double[] weights;
         double bias;
@@ -14,7 +14,7 @@ namespace NeuralNetworks
         Random random;
         Func<double, double, double> errorFunc;
 
-        public Perceptron(double[] initialWeightValues, double initialBiasValue, double rate, Random ran, Func<double, double, double> func)
+        public PerceptronBestFitLine(double[] initialWeightValues, double initialBiasValue, double rate, Random ran, Func<double, double, double> func)
         {
             /*initializes the weights array and bias*/
             weights = initialWeightValues;
@@ -24,7 +24,7 @@ namespace NeuralNetworks
             errorFunc = func;
         }
 
-        public Perceptron(int amountOfInputs, double rate, Random ran, Func<double, double, double> func)
+        public PerceptronBestFitLine(int amountOfInputs, double rate, Random ran, Func<double, double, double> func)
         {
             weights = new double[amountOfInputs];
             mutationRate = rate;
@@ -65,13 +65,13 @@ namespace NeuralNetworks
         public double GetError(double[][] inputs, double[] desiredOutputs)
         {
             double[] errors = new double[inputs.Length];
-            for(int i = 0; i < inputs.Length; i++)
+            for (int i = 0; i < inputs.Length; i++)
             {
                 errors[i] = errorFunc(Compute(inputs[i]), Compute(desiredOutputs));
             }
 
             double totalError = 0;
-            foreach(var val in errors)
+            foreach (var val in errors)
             {
                 totalError += val;
             }
@@ -108,7 +108,7 @@ namespace NeuralNetworks
                 }
             }
 
-            if(error > currentError)
+            if (error > currentError)
             {
                 weights = previousWeights;
                 bias = previousBias;
