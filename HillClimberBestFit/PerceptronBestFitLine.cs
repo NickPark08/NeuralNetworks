@@ -40,7 +40,7 @@ namespace HillClimberBestFit
             }
         }
 
-        public double Compute(double[] inputs)
+        private double Compute(double[] inputs)
         {
             double total = 0;
             for (int i = 0; i < inputs.Length; i++)
@@ -67,7 +67,7 @@ namespace HillClimberBestFit
             double[] errors = new double[inputs.Length];
             for (int i = 0; i < inputs.Length; i++)
             {
-                errors[i] = errorFunc(Compute(inputs[i]), Compute(desiredOutputs));
+                errors[i] = errorFunc(Compute(inputs[i]), desiredOutputs[i]);
             }
 
             double totalError = 0;
@@ -81,8 +81,12 @@ namespace HillClimberBestFit
 
         public double TrainWithHillClimbing(double[][] inputs, double[] desiredOutputs, double currentError)
         {
-            double error = GetError(inputs, desiredOutputs);
-            double[] previousWeights = weights;
+
+            double[] previousWeights = new double[weights.Length];
+            for(int i = 0; i < weights.Length; i++)
+            {
+                previousWeights[i] = weights[i];
+            }
             double previousBias = bias;
 
             if (random.Next(2) == 0)
@@ -107,7 +111,7 @@ namespace HillClimberBestFit
                     bias -= mutationRate;
                 }
             }
-
+            double error = GetError(inputs, desiredOutputs);
             if (error > currentError)
             {
                 weights = previousWeights;

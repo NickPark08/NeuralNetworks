@@ -62,7 +62,7 @@ namespace NeuralNetworks
             return totals;
         }
 
-        public double GetError(double[][] inputs, double[] desiredOutputs)
+        private double GetError(double[][] inputs, double[] desiredOutputs)
         {
             double[] errors = new double[inputs.Length];
             for(int i = 0; i < inputs.Length; i++)

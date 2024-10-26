@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using MonoGame.Extended;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,8 @@ namespace HillClimberBestFit
         private GraphicsDeviceManager _graphics;
         private SpriteBatch spriteBatch;
         private MouseState previousMs;
-        private List<Point> points;
+        private List<double[]> pointX;
+        private List<double> pointY;
         HillClimberLine line;
         private Random random;
         PerceptronBestFitLine perceptronLine;
@@ -24,6 +27,10 @@ namespace HillClimberBestFit
         Point initialPoint;
         float slope;
         float yIntercept;
+        double currentError;
+        double[] yPoints;
+        double[][] drawxs;
+        double[] drawys;
 
         public Game1()
         {
@@ -39,11 +46,13 @@ namespace HillClimberBestFit
             _graphics.PreferredBackBufferWidth = 1000;
             _graphics.ApplyChanges();
 
-            points = new List<Point>();
+            currentError = double.MaxValue;
+            pointX = new List<double[]>();
+            pointY = new List<double>();
             random = new Random();
-            line = new HillClimberLine(points, random);
+            //line = new HillClimberLine(points, random);
             errorFunc = ErrorFunc;
-            perceptronLine = new PerceptronBestFitLine(points.Count(), 0.1, random, errorFunc);
+            perceptronLine = new PerceptronBestFitLine(1, 0.1, random, errorFunc);
 
 
             base.Initialize();
@@ -69,26 +78,46 @@ namespace HillClimberBestFit
             MouseState ms = Mouse.GetState();
             if (ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released && IsActive)
             {
-                points.Add(new Point(ms.X, ms.Y));
+                pointX.Add([ms.X]);
+                pointY.Add(ms.Y);
             }
 
-
-        if (points.Count() > 1)
+            if (pointX.Count > 1)
             {
-                averageY = 0;
-                averageX = 0;
-                initialPoint = points[0];
-                foreach (var point in points)
+                double[][] xPoints = new double[pointX.Count][];
+                for(int i = 0; i < pointX.Count; i++)
                 {
-                    averageX += point.X;
-                    averageY += point.Y;
+                    xPoints[i] = new double[1];
+                    xPoints[i][0] = pointX[i][0];
                 }
-                averageX /= points.Count();
-                averageY /= points.Count();
-                slope = (float)(averageY - initialPoint.Y) / (averageX - initialPoint.X);
-                //y = mx + b -> b = y - mx
-                yIntercept = averageY - (slope * averageX);
+
+                currentError = perceptronLine.TrainWithHillClimbing(xPoints, pointY.ToArray(), currentError);
             }
+            drawxs = [[0],[GraphicsDevice.Viewport.Width]];
+            drawys = perceptronLine.Compute(drawxs);
+
+            //if (pointX.Count() > 1)
+            //    {
+            //        averageY = 0;
+            //        averageX = 0;
+            //        initialPoint = pointX[0][0];
+            //        foreach (var point in points)
+            //        {
+            //            averageX += point[0].X;
+            //            averageY += point[0].Y;
+            //        }
+            //        averageX /= points.Count();
+            //        averageY /= points.Count();
+            //        slope = (float)(averageY - initialPoint.Y) / (averageX - initialPoint.X);
+            //        //y = mx + b -> b = y - mx
+            //        yIntercept = averageY - (slope * averageX);
+
+
+
+            // yleft=Percptron(xleft)
+
+            //currentError = perceptronLine.TrainWithHillClimbing(currentError);
+            // }
 
             previousMs = ms;
             base.Update(gameTime);
@@ -103,19 +132,29 @@ namespace HillClimberBestFit
 
 
             spriteBatch.Begin();
+            spriteBatch.DrawLine((float)drawxs[0][0], (float)drawys[0], (float)drawxs[1][0], (float)drawys[1], Color.Black);
+            //if(points.Count() > 1)
+            //{
+            //    spriteBatch.DrawLine(new(0, yIntercept), 4000f, slope, Color.Black);
+            //}
 
-            if(points.Count() > 1)
+            Window.Title = $"{currentError}";
+
+
+            //foreach (var point in points)
+            //{
+            //    spriteBatch.DrawEllipse(point.ToVector2(), new(5, 5), 20, Color.Black, 10f);
+            //}
+
+
+            for (int i = 0; i < pointX.Count; i++)
             {
-                spriteBatch.DrawLine(new(0, yIntercept), 4000f, slope, Color.Black);
+                spriteBatch.DrawEllipse(new Vector2((float)pointX[i][0], (float)pointY[i]), new(5, 5), 20, Color.Black, 10f);
+
+
             }
 
-            Window.Title = $"{line.GetError()}";
 
-
-            foreach (var point in points)
-            {
-                spriteBatch.DrawEllipse(point.ToVector2(), new(5, 5), 20, Color.Black, 10f);
-            }
 
             spriteBatch.End();
 
