@@ -5,17 +5,35 @@ namespace NeuralNetworks
 {
     internal class Program
     {
+
         static void Main(string[] args)
         {
+            double ErrorFunc(double actual, double desired)
+            {
+                return Math.Pow(desired - actual, 2);
+            }
             Random random = new Random();
-            double[] weights = { .75, -1.25 };
-            double[][] inputs = [ [0,0], [.3, -.7], [1, 1], [-1, -1], [-.5, .5] ];
-            //Perceptron perceptron = new Perceptron(weights, .5, 0.1, random);
+            Func<double, double, double> errorFunc = ErrorFunc;
+            double currentError = double.MaxValue;
+            Perceptron perceptron = new Perceptron(4, .3, random, errorFunc);
+
+            double[][] inputs = [[0, 0], [0,1], [1,0], [1,1]];
+            double[] outputs = [0, 0, 0, 1];
+            double[] testInput = [1, 1];
+
+            while (currentError >= .05)
+            {
+                currentError = perceptron.TrainWithHillClimbing(inputs, outputs, currentError);
+            }
+
+            Console.WriteLine(perceptron.Compute(testInput));
 
             //foreach (var val in perceptron.Compute(inputs))
             //{
             //    Console.WriteLine(val);
             //}
         }
+
+    
     }
 }

@@ -11,6 +11,7 @@ namespace HillClimberBestFit
         double[] weights;
         double bias;
         double mutationRate;
+        double biasMutationRate;
         Random random;
         Func<double, double, double> errorFunc;
 
@@ -22,6 +23,7 @@ namespace HillClimberBestFit
             mutationRate = rate;
             random = ran;
             errorFunc = func;
+            biasMutationRate = 10;
         }
 
         public PerceptronBestFitLine(int amountOfInputs, double rate, Random ran, Func<double, double, double> func)
@@ -30,6 +32,7 @@ namespace HillClimberBestFit
             mutationRate = rate;
             random = ran;
             errorFunc = func;
+            biasMutationRate = 10;
         }
 
         private void Randomize(Random random, double min, double max)
@@ -104,11 +107,11 @@ namespace HillClimberBestFit
             {
                 if (random.Next(2) == 0)
                 {
-                    bias += mutationRate;
+                    bias += biasMutationRate;
                 }
                 else
                 {
-                    bias -= mutationRate;
+                    bias -= biasMutationRate;
                 }
             }
             double error = GetError(inputs, desiredOutputs);

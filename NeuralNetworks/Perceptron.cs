@@ -30,13 +30,14 @@ namespace NeuralNetworks
             mutationRate = rate;
             random = ran;
             errorFunc = func;
+            Randomize(random, 0, 1);
         }
 
         private void Randomize(Random random, double min, double max)
         {
             for (int i = 0; i < weights.Length; i++)
             {
-                weights[i] = (random.NextDouble() * min) + (max - min);
+                weights[i] = (random.NextDouble() * max) + min;
             }
         }
 
@@ -81,19 +82,30 @@ namespace NeuralNetworks
 
         public double TrainWithHillClimbing(double[][] inputs, double[] desiredOutputs, double currentError)
         {
-            double error = GetError(inputs, desiredOutputs);
-            double[] previousWeights = weights;
+            double[] previousWeights = new double[weights.Length];
+            for (int i = 0; i < weights.Length; i++)
+            {
+                previousWeights[i] = weights[i];
+            }
             double previousBias = bias;
 
             if (random.Next(2) == 0)
             {
-                if (random.Next(2) == 0)
+                int index = random.Next(weights.Length);
+                if (weights[index] <= mutationRate)
                 {
-                    weights[random.Next(weights.Length)] += mutationRate;
+                    weights[index] += mutationRate;
                 }
                 else
                 {
-                    weights[random.Next(weights.Length)] -= mutationRate;
+                    if (random.Next(2) == 0)
+                    {
+                        weights[index] += mutationRate;
+                    }
+                    else
+                    {
+                        weights[index] -= mutationRate;
+                    }
                 }
             }
             else
@@ -108,7 +120,8 @@ namespace NeuralNetworks
                 }
             }
 
-            if(error > currentError)
+            double error = GetError(inputs, desiredOutputs);
+            if (error > currentError)
             {
                 weights = previousWeights;
                 bias = previousBias;
