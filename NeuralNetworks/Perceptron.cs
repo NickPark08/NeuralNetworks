@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworks
 {
-    internal class Perceptron
+    public class Perceptron
     {
         double[] weights;
         double bias;
@@ -37,8 +37,9 @@ namespace NeuralNetworks
         {
             for (int i = 0; i < weights.Length; i++)
             {
-                weights[i] = (random.NextDouble() * max) + min;
+                weights[i] = (random.NextDouble() * (max-min)) + min;
             }
+            bias = (random.NextDouble() * (max - min)) + min;
         }
 
         public double Compute(double[] inputs)
@@ -63,12 +64,12 @@ namespace NeuralNetworks
             return totals;
         }
 
-        private double GetError(double[][] inputs, double[] desiredOutputs)
+        public double GetError(double[][] inputs, double[] desiredOutputs)
         {
             double[] errors = new double[inputs.Length];
             for(int i = 0; i < inputs.Length; i++)
             {
-                errors[i] = errorFunc(Compute(inputs[i]), Compute(desiredOutputs));
+                errors[i] = errorFunc(Compute(inputs[i]), desiredOutputs[i]);
             }
 
             double totalError = 0;
@@ -92,11 +93,11 @@ namespace NeuralNetworks
             if (random.Next(2) == 0)
             {
                 int index = random.Next(weights.Length);
-                if (weights[index] <= mutationRate)
-                {
-                    weights[index] += mutationRate;
-                }
-                else
+                //if (weights[index] <= mutationRate)
+                //{
+                //    weights[index] += mutationRate;
+                //}
+                //else
                 {
                     if (random.Next(2) == 0)
                     {
@@ -121,7 +122,7 @@ namespace NeuralNetworks
             }
 
             double error = GetError(inputs, desiredOutputs);
-            if (error > currentError)
+            if (error >= currentError)
             {
                 weights = previousWeights;
                 bias = previousBias;

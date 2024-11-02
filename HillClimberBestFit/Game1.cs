@@ -52,7 +52,7 @@ namespace HillClimberBestFit
             random = new Random();
             //line = new HillClimberLine(points, random);
             errorFunc = ErrorFunc;
-            perceptronLine = new PerceptronBestFitLine(1, 0.05, random, errorFunc);
+            perceptronLine = new PerceptronBestFitLine(1, 0.01, random, errorFunc);
 
 
             base.Initialize();
