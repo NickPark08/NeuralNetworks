@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using MonoGame.Extended;
 using NeuralNetworks;
 using System;
+using System.Transactions;
+using System.Linq;
 
 namespace PerceptronLinearClassification
 {
@@ -19,9 +21,11 @@ namespace PerceptronLinearClassification
         private Random random;
         private Func<double, double, double> errorFunc;
         private double currentError;
-        private double[][] inputs;
-        private double[] outputs;
+        private List<double[]> inputs;
+        private List<double> outputs;
         private double[] classes;
+        double max;
+        double min;
 
         public Game1()
         {
@@ -34,6 +38,28 @@ namespace PerceptronLinearClassification
             return Math.Pow(desired - actual, 2);
         }
 
+        private double[][] Normalize(double[][] inputs)
+        {
+            foreach (var arr in inputs)
+            {
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = ((arr[i] - min) / (max - min)) * (1 - 0) + 0;
+                }
+            }
+            return inputs;
+        }
+
+        private double[] UnNormalize(double[] inputs)
+        {
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                inputs[i] = ((inputs[i] - 0) / (1 - 0)) * (max - min) + min;
+            }
+
+            return inputs;
+        }
+
         protected override void Initialize()
         {
             _graphics.PreferredBackBufferHeight = 800;
@@ -43,7 +69,7 @@ namespace PerceptronLinearClassification
             errorFunc = ErrorFunc;
             random = new Random();
             points = new List<ClassifiedPoint>();
-            perceptron = new Perceptron(2, 1, random, errorFunc);
+            perceptron = new Perceptron(2, 10, random, errorFunc);
             currentError = double.MaxValue;
             inputs = [];
             outputs = [];
@@ -69,35 +95,35 @@ namespace PerceptronLinearClassification
             if (ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released && IsActive)
             {
                 points.Add(new ClassifiedPoint(ms.X, ms.Y, 0));
+                inputs.Add([ms.X, ms.Y]);
+                outputs.Add(0);
+                currentError = double.MaxValue;
+                max = inputs.Max(m => m.Max());
+                min = inputs.Min(m => m.Min());
+                //inputs = Normalize(inputs.ToArray()).ToList();
             }
 
             if (ms.RightButton == ButtonState.Pressed && previousMs.RightButton == ButtonState.Released && IsActive)
             {
                 points.Add(new ClassifiedPoint(ms.X, ms.Y, 1));
+                inputs.Add([ms.X, ms.Y]);
+                outputs.Add(1);
+                currentError = double.MaxValue;
+                max = inputs.Max(m => m.Max());
+                min = inputs.Min(m => m.Min());
+                //inputs = Normalize(inputs.ToArray()).ToList();
+
             }
 
-            if (ks.IsKeyDown(Keys.Space) && previousKs.IsKeyUp(Keys.Space))
-            {
-                inputs = new double[points.Count][];
-                outputs = new double[points.Count];
-                classes = new double[points.Count];
-
-                for (int i = 0; i < points.Count; i++)
-                {
-                    //add inputs when adding points so training works
-                    inputs[i] = new double[2];
-                    outputs[i] = points[i].Class;
-                    inputs[i][0] = points[i].Point.X;
-                    inputs[i][1] = points[i].Point.Y;
-                }
-            }
             if (points.Count > 0)
             {
-                currentError = perceptron.TrainWithHillClimbing(inputs, outputs, currentError);
-                classes = perceptron.Compute(inputs);
+                currentError = perceptron.TrainWithHillClimbing(Normalize(inputs.ToArray()), outputs.ToArray(), currentError);
             }
+            classes = UnNormalize(perceptron.Compute(inputs.ToArray()));
 
-
+            //if (ks.IsKeyDown(Keys.Space) && previousKs.IsKeyUp(Keys.Space))
+            //{
+            //}
 
 
             previousMs = ms;
@@ -110,6 +136,9 @@ namespace PerceptronLinearClassification
             GraphicsDevice.Clear(Color.White);
 
             spriteBatch.Begin();
+
+            Window.Title = $"{currentError}";
+
             foreach (var point in points)
             {
                 if (point.Class == 0)
@@ -122,15 +151,24 @@ namespace PerceptronLinearClassification
                 }
             }
 
-            for (int i = 0; i < inputs.Length; i++)
+            //if (classes.Length > 0)
+            //{
+            //    inputs = UnNormalize(inputs.ToArray()).ToList();
+
+            //}
+
+            //unnormalize inputs to draw circles
+            
+
+            for (int i = 0; i < classes.Length; i++)
             {
-                if (classes[i] == 0)
+                if (Math.Round(classes[i]) <= 0)
                 {
-                    spriteBatch.DrawEllipse(new((float)inputs[i][0], (float)inputs[i][1]), new(8, 8), 20, Color.Blue);
+                    spriteBatch.DrawEllipse(new((float)inputs[i][0], (float)inputs[i][1]), new(9, 9), 20, Color.Blue);
                 }
                 else
                 {
-                    spriteBatch.DrawEllipse(new((float)inputs[i][0], (float)inputs[i][1]), new(8, 8), 20, Color.Red);
+                    spriteBatch.DrawEllipse(new((float)inputs[i][0], (float)inputs[i][1]), new(9, 9), 20, Color.Red);
                 }
             }
             spriteBatch.End();
