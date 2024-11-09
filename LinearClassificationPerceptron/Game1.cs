@@ -24,8 +24,8 @@ namespace PerceptronLinearClassification
         private List<double[]> inputs;
         private List<double> outputs;
         private double[] classes;
-        double max;
-        double min;
+
+        bool train = false;
 
         public Game1()
         {
@@ -38,27 +38,27 @@ namespace PerceptronLinearClassification
             return Math.Pow(desired - actual, 2);
         }
 
-        private double[][] Normalize(double[][] inputs)
-        {
-            foreach (var arr in inputs)
-            {
-                for (int i = 0; i < arr.Length; i++)
-                {
-                    arr[i] = ((arr[i] - min) / (max - min)) * (1 - 0) + 0;
-                }
-            }
-            return inputs;
-        }
+        //private double[][] Normalize(double[][] inputs)
+        //{
+        //    foreach (var arr in inputs)
+        //    {
+        //        for (int i = 0; i < arr.Length; i++)
+        //        {
+        //            arr[i] = ((arr[i] - min) / (max - min)) * (1 - 0) + 0;
+        //        }
+        //    }
+        //    return inputs;
+        //}
 
-        private double[] UnNormalize(double[] inputs)
-        {
-            for (int i = 0; i < inputs.Length; i++)
-            {
-                inputs[i] = ((inputs[i] - 0) / (1 - 0)) * (max - min) + min;
-            }
+        //private double[] UnNormalize(double[] inputs)
+        //{
+        //    for (int i = 0; i < inputs.Length; i++)
+        //    {
+        //        inputs[i] = ((inputs[i] - 0) / (1 - 0)) * (max - min) + min;
+        //    }
 
-            return inputs;
-        }
+        //    return inputs;
+        //}
 
         protected override void Initialize()
         {
@@ -69,7 +69,7 @@ namespace PerceptronLinearClassification
             errorFunc = ErrorFunc;
             random = new Random();
             points = new List<ClassifiedPoint>();
-            perceptron = new Perceptron(2, 10, random, errorFunc);
+            perceptron = new Perceptron(2, .1, random, errorFunc);
             currentError = double.MaxValue;
             inputs = [];
             outputs = [];
@@ -98,9 +98,6 @@ namespace PerceptronLinearClassification
                 inputs.Add([ms.X, ms.Y]);
                 outputs.Add(0);
                 currentError = double.MaxValue;
-                max = inputs.Max(m => m.Max());
-                min = inputs.Min(m => m.Min());
-                //inputs = Normalize(inputs.ToArray()).ToList();
             }
 
             if (ms.RightButton == ButtonState.Pressed && previousMs.RightButton == ButtonState.Released && IsActive)
@@ -109,21 +106,21 @@ namespace PerceptronLinearClassification
                 inputs.Add([ms.X, ms.Y]);
                 outputs.Add(1);
                 currentError = double.MaxValue;
-                max = inputs.Max(m => m.Max());
-                min = inputs.Min(m => m.Min());
-                //inputs = Normalize(inputs.ToArray()).ToList();
 
             }
 
-            if (points.Count > 0)
+            if (train && points.Count > 0)
             {
-                currentError = perceptron.TrainWithHillClimbing(Normalize(inputs.ToArray()), outputs.ToArray(), currentError);
+                //inputs = perceptron.Normalize(inputs.ToArray()).ToList();
+                currentError = perceptron.TrainWithHillClimbing(perceptron.Normalize(inputs.ToArray()), outputs.ToArray(), currentError);
+                classes = perceptron.UnNormalize(perceptron.Compute(perceptron.Normalize(inputs.ToArray())), perceptron.Normalize(inputs.ToArray()).Max(m => m.Max()), perceptron.Normalize(inputs.ToArray()).Min(m => m.Min()));
             }
-            classes = UnNormalize(perceptron.Compute(inputs.ToArray()));
+            //classes = UnNormalize(perceptron.Compute(inputs.ToArray()));
 
-            //if (ks.IsKeyDown(Keys.Space) && previousKs.IsKeyUp(Keys.Space))
-            //{
-            //}
+            if (ks.IsKeyDown(Keys.Space) && previousKs.IsKeyUp(Keys.Space))
+            {
+                train = !train;
+            }
 
 
             previousMs = ms;

@@ -131,5 +131,33 @@ namespace NeuralNetworks
 
             return error;
         }
+
+        public double[][] Normalize(double[][] inputs)
+        {
+            double max = inputs.Max(m => m.Max());
+            double min = inputs.Min(m => m.Min());
+            double[][] arr = new double[inputs.Length][];
+
+            for(int j = 0; j < inputs.Length; j++)
+            {
+                arr[j] = new double[inputs[j].Length];
+                for (int i = 0; i < inputs[j].Length; i++)
+                {
+                    arr[j][i] = ((inputs[j][i] - min) / (max - min)) * (1 - 0) + 0;
+                }
+            }
+            return arr;
+        }
+
+        public double[] UnNormalize(double[] inputs, double max, double min)
+        {
+            double[] arr = new double[inputs.Length];
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                arr[i] = ((inputs[i] - 0) / (1 - 0)) * (max - min) + min;
+            }
+
+            return arr;
+        }
     }
 }
