@@ -8,14 +8,9 @@ namespace NeuralNetworks
 
         static void Main(string[] args)
         {
-            double ErrorFunc(double actual, double desired)
-            {
-                return Math.Pow(desired - actual, 2);
-            }
             Random random = new Random();
-            Func<double, double, double> errorFunc = ErrorFunc;
             double currentError = double.MaxValue;
-            Perceptron perceptron = new Perceptron(3, .1, random, errorFunc);
+            Perceptron perceptron = new Perceptron(3, .1, random, ErrorFunctions.MSE, ActivationFunctions.TanH);
 
             double[][] inputs = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
             double[] outputs = [0, 0, 0, 1, 0, 1, 1, 1];
@@ -30,9 +25,12 @@ namespace NeuralNetworks
 
             foreach(var val in finalOutputs)
             {
-                Console.WriteLine(Math.Round(val));
+                Console.Write(perceptron.activationFunc.Function(val));
+                Console.WriteLine("      " + Math.Round(perceptron.activationFunc.Function(val)));
+
             }
 
+            Console.WriteLine();
             Console.WriteLine(currentError);
 
             //foreach (var val in perceptron.Compute(inputs))

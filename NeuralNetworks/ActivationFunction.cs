@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworks
 {
-    internal class ActivationFunction
+    public class ActivationFunction
     {
         Func<double, double> function;
         Func<double, double> derivative;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,9 +13,12 @@ namespace NeuralNetworks
         double bias;
         double mutationRate;
         Random random;
-        Func<double, double, double> errorFunc;
+        //Func<double, double, double> errorFunc;
+        ErrorFunction errorFunc;
+        public ActivationFunction activationFunc;
+        public double learningRate { get; set; }
 
-        public Perceptron(double[] initialWeightValues, double initialBiasValue, double rate, Random ran, Func<double, double, double> func)
+        public Perceptron(double[] initialWeightValues, double initialBiasValue, double rate, Random ran, ErrorFunction func, ActivationFunction activation)
         {
             /*initializes the weights array and bias*/
             weights = initialWeightValues;
@@ -22,14 +26,17 @@ namespace NeuralNetworks
             mutationRate = rate;
             random = ran;
             errorFunc = func;
+            activationFunc = activation;
         }
 
-        public Perceptron(int amountOfInputs, double rate, Random ran, Func<double, double, double> func)
+        public Perceptron(int amountOfInputs, double rate, Random ran, ErrorFunction func, ActivationFunction activation)
         {
             weights = new double[amountOfInputs];
             mutationRate = rate;
+            learningRate = rate;
             random = ran;
             errorFunc = func;
+            activationFunc = activation;
             Randomize(random, 0, 1);
         }
 
@@ -66,19 +73,12 @@ namespace NeuralNetworks
 
         public double GetError(double[][] inputs, double[] desiredOutputs)
         {
-            double[] errors = new double[inputs.Length];
-            for(int i = 0; i < inputs.Length; i++)
+            double sum = 0;
+            for (int i = 0; i < inputs.Length; i++)
             {
-                errors[i] = errorFunc(Compute(inputs[i]), desiredOutputs[i]);
+                sum += errorFunc.Function(Compute(inputs[i]), desiredOutputs[i]);
             }
-
-            double totalError = 0;
-            foreach(var val in errors)
-            {
-                totalError += val;
-            }
-
-            return totalError / errors.Length;
+            return sum/desiredOutputs.Length;
         }
 
         public double TrainWithHillClimbing(double[][] inputs, double[] desiredOutputs, double currentError)
@@ -130,6 +130,22 @@ namespace NeuralNetworks
             }
 
             return error;
+        }
+
+        public double Train(double[] inputs, double desiredOutput)
+        {
+            double error = double.MaxValue;
+            //weights
+            if(random.Next(2) == 0)
+            {
+                int index = random.Next(inputs.Length);
+                weights[index] += errorFunc.Derivative(inputs[index], desiredOutput) * activationFunc.Derivative(Compute(inputs)) * inputs[index];
+            }
+            //bias
+            else
+            {
+                bias += errorFunc.Derivative(bias, desiredOutput) * activationFunc.Derivative(Compute(inputs));
+            }
         }
 
         public double[][] Normalize(double[][] inputs)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworks
 {
-    internal class ErrorFunction
+    public class ErrorFunction
     {
         Func<double, double, double> function;
         Func<double, double, double> derivative;

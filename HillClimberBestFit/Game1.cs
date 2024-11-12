@@ -21,7 +21,7 @@ namespace HillClimberBestFit
         HillClimberLine line;
         private Random random;
         PerceptronBestFitLine perceptronLine;
-        Func<double, double, double> errorFunc;
+        //Func<double, double, double> ;
         int averageX;
         int averageY;
         Point initialPoint;
