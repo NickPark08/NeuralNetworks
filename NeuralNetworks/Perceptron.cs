@@ -17,6 +17,7 @@ namespace NeuralNetworks
         ErrorFunction errorFunc;
         public ActivationFunction activationFunc;
         public double learningRate { get; set; }
+        List<double> adjustments = new List<double>();
 
         public Perceptron(double[] initialWeightValues, double initialBiasValue, double rate, Random ran, ErrorFunction func, ActivationFunction activation)
         {
@@ -44,7 +45,7 @@ namespace NeuralNetworks
         {
             for (int i = 0; i < weights.Length; i++)
             {
-                weights[i] = (random.NextDouble() * (max-min)) + min;
+                weights[i] = (random.NextDouble() * (max - min)) + min;
             }
             bias = (random.NextDouble() * (max - min)) + min;
         }
@@ -78,7 +79,7 @@ namespace NeuralNetworks
             {
                 sum += errorFunc.Function(Compute(inputs[i]), desiredOutputs[i]);
             }
-            return sum/desiredOutputs.Length;
+            return sum / desiredOutputs.Length;
         }
 
         public double TrainWithHillClimbing(double[][] inputs, double[] desiredOutputs, double currentError)
@@ -134,18 +135,38 @@ namespace NeuralNetworks
 
         public double Train(double[] inputs, double desiredOutput)
         {
-            double error = double.MaxValue;
-            //weights
-            if(random.Next(2) == 0)
+            double error = errorFunc.Function(activationFunc.Function(Compute(inputs)), desiredOutput);
+
+            for (int i = 0; i < weights.Length; i++)
             {
-                int index = random.Next(inputs.Length);
-                weights[index] += errorFunc.Derivative(inputs[index], desiredOutput) * activationFunc.Derivative(Compute(inputs)) * inputs[index];
+                weights[i] += -learningRate * (errorFunc.Derivative(activationFunc.Function(Compute(inputs)), desiredOutput) * activationFunc.Derivative(Compute(inputs)) * inputs[i]);
             }
-            //bias
-            else
+            bias += -learningRate * (errorFunc.Derivative(activationFunc.Function(Compute(inputs)), desiredOutput) * activationFunc.Derivative(Compute(inputs)));
+
+            return error;
+        }
+
+        public double Train(double[][] inputs, double[] desiredOutputs)
+        {
+            double sumAdjustment = 0;
+
+            for (int i = 0; i < weights.Length; i++)
             {
-                bias += errorFunc.Derivative(bias, desiredOutput) * activationFunc.Derivative(Compute(inputs));
+                sumAdjustment = -learningRate * (errorFunc.Derivative(activationFunc.Function(Compute(inputs[i])), desiredOutputs[i]) * activationFunc.Derivative(Compute(inputs[i])));
+                for (int j = 0; j < inputs.Length; j++)
+                {
+                    weights[i] += sumAdjustment * inputs[j][i];
+                }
             }
+            bias += sumAdjustment;
+            //for (int i = 0; i < inputs.Length; i++)
+            //{
+            //    sumAdjustment += learningRate * -(errorFunc.Derivative(activationFunc.Function(Compute(inputs[i])), desiredOutputs[i]) * activationFunc.Derivative(Compute(inputs[i])));
+            //}
+
+
+
+            return GetError(inputs, desiredOutputs);
         }
 
         public double[][] Normalize(double[][] inputs)
@@ -154,7 +175,7 @@ namespace NeuralNetworks
             double min = inputs.Min(m => m.Min());
             double[][] arr = new double[inputs.Length][];
 
-            for(int j = 0; j < inputs.Length; j++)
+            for (int j = 0; j < inputs.Length; j++)
             {
                 arr[j] = new double[inputs[j].Length];
                 for (int i = 0; i < inputs[j].Length; i++)

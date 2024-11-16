@@ -16,14 +16,20 @@ namespace NeuralNetworks
             double[] outputs = [0, 0, 0, 1, 0, 1, 1, 1];
             double[] testInput = [1, 0];
 
-            while (currentError > 0.085)
+            double testOutput = 0;
+
+            //error super high
+            //check both single and batch train for bugs
+
+            while (currentError > .1)
             {
-                currentError = perceptron.TrainWithHillClimbing(inputs, outputs, currentError);
+                //currentError = perceptron.TrainWithHillClimbing(inputs, outputs, currentError);
+                currentError = perceptron.Train(inputs, outputs);
             }
 
             double[] finalOutputs = perceptron.Compute(inputs);
 
-            foreach(var val in finalOutputs)
+            foreach (var val in finalOutputs)
             {
                 Console.Write(perceptron.activationFunc.Function(val));
                 Console.WriteLine("      " + Math.Round(perceptron.activationFunc.Function(val)));
