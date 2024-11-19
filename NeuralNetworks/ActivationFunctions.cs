@@ -12,7 +12,7 @@ namespace NeuralNetworks
 
         public static ActivationFunction Sigmoid => new ActivationFunction(x => 1 / (1 + Math.Pow(Math.E, -x)), x => 1 / (1 + Math.Pow(Math.E, -x) * (1 - (1 / (1 + Math.Pow(Math.E, -x))))));
 
-        public static ActivationFunction TanH => new ActivationFunction(x => Math.Tanh(x), x => 1 - Math.Pow(Math.Tanh(x), 2));//(Math.tanh(Math.E, x) - Math.Pow(Math.E, -x)) / (Math.Pow(Math.E, x) + Math.Pow(Math.E, -x)), x => 1 - Math.Pow((Math.Pow(Math.E, x) - Math.Pow(Math.E, -x)) / (Math.Pow(Math.E, x) + Math.Pow(Math.E, -x)), 2));
+        public static ActivationFunction TanH => new ActivationFunction(Math.Tanh, x => 1 - Math.Pow(Math.Tanh(x), 2));//(Math.tanh(Math.E, x) - Math.Pow(Math.E, -x)) / (Math.Pow(Math.E, x) + Math.Pow(Math.E, -x)), x => 1 - Math.Pow((Math.Pow(Math.E, x) - Math.Pow(Math.E, -x)) / (Math.Pow(Math.E, x) + Math.Pow(Math.E, -x)), 2));
 
         public static ActivationFunction ReLU => new ActivationFunction(x => x <= 0 ? 0 : x, x => x <= 0 ? 0 : 1);
     }

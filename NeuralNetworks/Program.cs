@@ -10,21 +10,20 @@ namespace NeuralNetworks
         {
             Random random = new Random();
             double currentError = double.MaxValue;
-            Perceptron perceptron = new Perceptron(3, .1, random, ErrorFunctions.MSE, ActivationFunctions.TanH);
+            Perceptron perceptron = new Perceptron(2, .000005, random, ErrorFunctions.MSE, ActivationFunctions.Sigmoid);
 
-            double[][] inputs = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
-            double[] outputs = [0, 0, 0, 1, 0, 1, 1, 1];
-            double[] testInput = [1, 0];
+            //double[][] inputs = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
+            double[][] inputs = [[0, 0], [0, 1], [1, 0], [1, 1]];
 
-            double testOutput = 0;
+            double[] outputs = [1, 1, 1, 0];
 
-            //error super high
-            //check both single and batch train for bugs
-
-            while (currentError > .1)
+            // learning rate decreases -> error should be able to go lower
+            // bug in training, lower learning rate should mean lower error before overshoot
+            while (currentError > .05)
             {
-                //currentError = perceptron.TrainWithHillClimbing(inputs, outputs, currentError);
-                currentError = perceptron.Train(inputs, outputs);
+                currentError = perceptron.BatchTrain(inputs, outputs);
+                Console.SetCursorPosition(0,0);
+                Console.Write($"{currentError}              ");
             }
 
             double[] finalOutputs = perceptron.Compute(inputs);

@@ -135,38 +135,38 @@ namespace NeuralNetworks
 
         public double Train(double[] inputs, double desiredOutput)
         {
-            double error = errorFunc.Function(activationFunc.Function(Compute(inputs)), desiredOutput);
+            double error = errorFunc.Function(activationFunc.Function(Compute(inputs)), desiredOutput) / inputs.Length;
+            double adjustment = learningRate * -(errorFunc.Derivative(activationFunc.Function(Compute(inputs)), desiredOutput) * activationFunc.Derivative(Compute(inputs)));
 
             for (int i = 0; i < weights.Length; i++)
             {
-                weights[i] += -learningRate * (errorFunc.Derivative(activationFunc.Function(Compute(inputs)), desiredOutput) * activationFunc.Derivative(Compute(inputs)) * inputs[i]);
+                for (int j = 0; j < inputs.Length; j++)
+                {
+                    weights[i] += adjustment * inputs[j];
+                }
             }
-            bias += -learningRate * (errorFunc.Derivative(activationFunc.Function(Compute(inputs)), desiredOutput) * activationFunc.Derivative(Compute(inputs)));
+            bias += adjustment;
 
             return error;
         }
 
-        public double Train(double[][] inputs, double[] desiredOutputs)
+        public double BatchTrain(double[][] inputs, double[] desiredOutputs)
         {
-            double sumAdjustment = 0;
+            //double sumAdjustment = 0;
+            double error = GetError(inputs, desiredOutputs);
+            double[] computedOutputs = Compute(inputs);
 
-            for (int i = 0; i < weights.Length; i++)
+            for (int i = 0; i < inputs.Length; i++)
             {
-                sumAdjustment = -learningRate * (errorFunc.Derivative(activationFunc.Function(Compute(inputs[i])), desiredOutputs[i]) * activationFunc.Derivative(Compute(inputs[i])));
-                for (int j = 0; j < inputs.Length; j++)
+                for (int j = 0; j < weights.Length; j++)
                 {
-                    weights[i] += sumAdjustment * inputs[j][i];
+                    weights[j] -= learningRate * -(errorFunc.Derivative(activationFunc.Function(computedOutputs[i]), desiredOutputs[i]) * activationFunc.Derivative(computedOutputs[i]) * inputs[i][j]);
                 }
+                bias -= learningRate * -(errorFunc.Derivative(activationFunc.Function(computedOutputs[i]), desiredOutputs[i]) * activationFunc.Derivative(computedOutputs[i]));
             }
-            bias += sumAdjustment;
-            //for (int i = 0; i < inputs.Length; i++)
-            //{
-            //    sumAdjustment += learningRate * -(errorFunc.Derivative(activationFunc.Function(Compute(inputs[i])), desiredOutputs[i]) * activationFunc.Derivative(Compute(inputs[i])));
-            //}
 
 
-
-            return GetError(inputs, desiredOutputs);
+            return error;
         }
 
         public double[][] Normalize(double[][] inputs)
