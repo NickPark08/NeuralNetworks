@@ -135,39 +135,51 @@ namespace NeuralNetworks
 
         public double Train(double[] inputs, double desiredOutput)
         {
-            double error = errorFunc.Function(activationFunc.Function(Compute(inputs)), desiredOutput) / inputs.Length;
-            double adjustment = learningRate * -(errorFunc.Derivative(activationFunc.Function(Compute(inputs)), desiredOutput) * activationFunc.Derivative(Compute(inputs)));
+            double computedOutput = activationFunc.Function(Compute(inputs));
+
+            double error = errorFunc.Function(computedOutput, desiredOutput);
+            double gradient = errorFunc.Derivative(computedOutput, desiredOutput) * activationFunc.Derivative(Compute(inputs));
 
             for (int i = 0; i < weights.Length; i++)
             {
-                for (int j = 0; j < inputs.Length; j++)
-                {
-                    weights[i] += adjustment * inputs[j];
-                }
+                weights[i] -= learningRate * gradient * inputs[i];
             }
-            bias += adjustment;
+            bias -= learningRate * gradient;
 
             return error;
         }
+
 
         public double BatchTrain(double[][] inputs, double[] desiredOutputs)
         {
-            //double sumAdjustment = 0;
-            double error = GetError(inputs, desiredOutputs);
-            double[] computedOutputs = Compute(inputs);
+            double[] weightGradients = new double[weights.Length];
+            double biasGradient = 0;
+            double totalError = 0;
 
             for (int i = 0; i < inputs.Length; i++)
             {
+                double computedOutput = activationFunc.Function(Compute(inputs[i]));
+                double error = errorFunc.Function(computedOutput, desiredOutputs[i]);
+                totalError += error;
+
+                double gradient = errorFunc.Derivative(computedOutput, desiredOutputs[i]) * activationFunc.Derivative(Compute(inputs[i]));
+
                 for (int j = 0; j < weights.Length; j++)
                 {
-                    weights[j] -= learningRate * -(errorFunc.Derivative(activationFunc.Function(computedOutputs[i]), desiredOutputs[i]) * activationFunc.Derivative(computedOutputs[i]) * inputs[i][j]);
+                    weightGradients[j] += gradient * inputs[i][j];
                 }
-                bias -= learningRate * -(errorFunc.Derivative(activationFunc.Function(computedOutputs[i]), desiredOutputs[i]) * activationFunc.Derivative(computedOutputs[i]));
+                biasGradient += gradient;
             }
 
+            for (int j = 0; j < weights.Length; j++)
+            {
+                weights[j] -= learningRate * (weightGradients[j] / inputs.Length);
+            }
+            bias -= learningRate * (biasGradient / inputs.Length);
 
-            return error;
+            return totalError / inputs.Length;
         }
+
 
         public double[][] Normalize(double[][] inputs)
         {
