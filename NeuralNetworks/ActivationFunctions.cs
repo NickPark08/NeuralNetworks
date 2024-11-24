@@ -10,6 +10,8 @@ namespace NeuralNetworks
     {
         public static ActivationFunction Identity => new ActivationFunction(x => x, x => 1);
 
+        public static ActivationFunction BinaryStep => new ActivationFunction(Math.Round, x => 0);
+
         public static ActivationFunction Sigmoid => new ActivationFunction(x => 1 / (1 + Math.Pow(Math.E, -x)), x => 1 / (1 + Math.Pow(Math.E, -x) * (1 - (1 / (1 + Math.Pow(Math.E, -x))))));
 
         public static ActivationFunction TanH => new ActivationFunction(Math.Tanh, x => 1 - Math.Pow(Math.Tanh(x), 2));//(Math.tanh(Math.E, x) - Math.Pow(Math.E, -x)) / (Math.Pow(Math.E, x) + Math.Pow(Math.E, -x)), x => 1 - Math.Pow((Math.Pow(Math.E, x) - Math.Pow(Math.E, -x)) / (Math.Pow(Math.E, x) + Math.Pow(Math.E, -x)), 2));

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using NeuralNetworks;
 
 namespace HillClimberBestFit
 {
@@ -20,7 +21,7 @@ namespace HillClimberBestFit
         private List<double> pointY;
         HillClimberLine line;
         private Random random;
-        PerceptronBestFitLine perceptronLine;
+        Perceptron perceptronLine;
         //Func<double, double, double> ;
         int averageX;
         int averageY;
@@ -51,8 +52,8 @@ namespace HillClimberBestFit
             pointY = new List<double>();
             random = new Random();
             //line = new HillClimberLine(points, random);
-            errorFunc = ErrorFunc;
-            perceptronLine = new PerceptronBestFitLine(1, 0.01, random, errorFunc);
+            //errorFunc = ErrorFunc;
+            perceptronLine = new Perceptron(1, .001, random, ErrorFunctions.MSE, ActivationFunctions.Sigmoid);
 
 
             base.Initialize();
@@ -92,7 +93,7 @@ namespace HillClimberBestFit
                     xPoints[i][0] = pointX[i][0];
                 }
 
-                currentError = perceptronLine.TrainWithHillClimbing(xPoints, pointY.ToArray(), currentError);
+                currentError = perceptronLine.BatchTrain(xPoints, pointY.ToArray());
             }
             drawxs = [[0],[GraphicsDevice.Viewport.Width]];
             drawys = perceptronLine.Compute(drawxs);
@@ -133,7 +134,7 @@ namespace HillClimberBestFit
 
 
             spriteBatch.Begin();
-            spriteBatch.DrawLine((float)drawxs[0][0], (float)drawys[0], (float)drawxs[1][0], (float)drawys[1], Color.Black);
+            spriteBatch.DrawLine((float)drawxs[0][0], (float)perceptronLine.activationFunc.Function(drawys[0]), (float)drawxs[1][0], (float)perceptronLine.activationFunc.Function(drawys[1]), Color.Black);
             //if(points.Count() > 1)
             //{
             //    spriteBatch.DrawLine(new(0, yIntercept), 4000f, slope, Color.Black);

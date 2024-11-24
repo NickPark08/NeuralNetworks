@@ -173,9 +173,9 @@ namespace NeuralNetworks
 
             for (int j = 0; j < weights.Length; j++)
             {
-                weights[j] -= learningRate * (weightGradients[j] / inputs.Length);
+                weights[j] += learningRate * (weightGradients[j] / inputs.Length);
             }
-            bias -= learningRate * (biasGradient / inputs.Length);
+            bias += learningRate * (biasGradient / inputs.Length);
 
             return totalError / inputs.Length;
         }

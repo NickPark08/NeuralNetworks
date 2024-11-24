@@ -10,12 +10,12 @@ namespace NeuralNetworks
         {
             Random random = new Random();
             double currentError = double.MaxValue;
-            Perceptron perceptron = new Perceptron(2, .000005, random, ErrorFunctions.MSE, ActivationFunctions.Sigmoid);
+            Perceptron perceptron = new Perceptron(3, .0005, random, ErrorFunctions.MSE, ActivationFunctions.Sigmoid);
 
-            //double[][] inputs = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
-            double[][] inputs = [[0, 0], [0, 1], [1, 0], [1, 1]];
+            double[][] inputs = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
+            //double[][] inputs = [[0, 0], [0, 1], [1, 0], [1, 1]];
 
-            double[] outputs = [1, 1, 1, 0];
+            double[] outputs = [0, 0, 0, 1, 0, 1, 1, 1];
 
             // learning rate decreases -> error should be able to go lower
             // bug in training, lower learning rate should mean lower error before overshoot
@@ -31,7 +31,7 @@ namespace NeuralNetworks
             foreach (var val in finalOutputs)
             {
                 Console.Write(perceptron.activationFunc.Function(val));
-                Console.WriteLine("      " + Math.Round(perceptron.activationFunc.Function(val)));
+                //Console.WriteLine("      " + Math.Round(perceptron.activationFunc.Function(val)));
 
             }
 
