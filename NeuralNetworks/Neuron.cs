@@ -8,8 +8,8 @@ namespace NeuralNetworks
 {
     public class Neuron
     {
-        double bias;
-        Dendrite[] dendrites;
+        public double bias;
+        public Dendrite[] dendrites;
         public double Output { get; set; }
         public double Input { get; private set; }
         public ActivationFunction Activation { get; set; }

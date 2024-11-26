@@ -8,7 +8,7 @@ namespace NeuralNetworks
 {
     public class NeuralNetwork
     {
-        Layer[] layers;
+        public Layer[] layers;
         ErrorFunction errorFunc;
 
         public NeuralNetwork(ActivationFunction activation, ErrorFunction errorFunc, params int[] neuronsPerLayer)
@@ -30,11 +30,26 @@ namespace NeuralNetworks
         }
         public double[] Compute(double[] inputs) 
         {
-            return null;
+            double[] output = new double[layers[0].Outputs.Length];
+            for(int i = 0; i < layers[0].Outputs.Length; i++)
+            {
+                layers[0].Neurons[i].Output = inputs[i];
+            }
+            for(int i = 0; i < layers.Length; i++)
+            {
+                output = layers[i].Compute();
+            }
+            return output;
         }
         public double GetError(double[] inputs, double[] desiredOutputs) 
         {
-            return 0;
+            double sum = 0;
+            double[] computedInputs = Compute(inputs);
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                sum += errorFunc.Function(inputs[i], desiredOutputs[i]);
+            }
+            return sum / desiredOutputs.Length;
         }
     }
 }
