@@ -11,25 +11,31 @@ namespace NeuralNetworks
         public Neuron[] Neurons { get; }
         public double[] Outputs { get; }
 
-        public Layer(ActivationFunction activation, int neuronCount, Layer previousLayer) 
+        public Layer(ActivationFunction activation, int neuronCount, Layer previousLayer)
         {
             Neurons = new Neuron[neuronCount];
             Outputs = new double[neuronCount];
-            for(int i = 0; i < neuronCount; i++)
+            Neuron[] previousNeurons = null;
+            if (previousLayer != null)
             {
-                Neurons[i] = new Neuron(activation, previousLayer.Neurons);
+                previousNeurons = previousLayer.Neurons;
+            }
+
+            for (int i = 0; i < neuronCount; i++)
+            {
+                Neurons[i] = new Neuron(activation, previousNeurons);
             }
         }
-        public void Randomize(Random random, double min, double max) 
+        public void Randomize(Random random, double min, double max)
         {
             foreach (Neuron neuron in Neurons)
             {
                 neuron.Randomize(random, min, max);
             }
         }
-        public double[] Compute() 
+        public double[] Compute()
         {
-            for(int i = 0; i < Outputs.Length; i++)
+            for (int i = 0; i < Outputs.Length; i++)
             {
                 Outputs[i] = Neurons[i].Compute();
             }

@@ -9,10 +9,29 @@ namespace NeuralNetworks
 {
     public class GeneticGates
     {
-
-        public double Fitness(NeuralNetwork network, double[] inputs, double[] desiredOutpus)
+        double min;
+        double max;
+        public NeuralNetwork[] networks;
+        public GeneticGates(double min, double max, int netCount)
         {
-            return -network.GetError(inputs, desiredOutpus);
+            this.min = min;
+            this.max = max;
+            networks = new NeuralNetwork[netCount];
+            for(int i = 0; i < networks.Length; i++)
+            {
+                networks[i] = new NeuralNetwork(ActivationFunctions.Sigmoid, ErrorFunctions.MSE, [2, 1, 1]);
+            }
+        }
+
+
+        public double Fitness(NeuralNetwork network, double[][] inputs, double[] desiredOutputs)
+        {
+            double sum = 0;
+            for(int i = 0; i < inputs.Length; i++)
+            {
+                sum += -network.GetError(inputs[i], desiredOutputs);
+            }
+            return sum / inputs.Length;
         }
 
         public void Mutate(NeuralNetwork net, Random random, double mutationRate)
@@ -22,17 +41,20 @@ namespace NeuralNetworks
                 foreach (Neuron neuron in layer.Neurons)
                 {
                     //Mutate the Weights
-                    for (int i = 0; i < neuron.dendrites.Length; i++)
+                    if(neuron.dendrites != null)
                     {
-                        if (random.NextDouble() < mutationRate)
+                        for (int i = 0; i < neuron.dendrites.Length; i++)
                         {
-                            if (random.Next(2) == 0)
+                            if (random.NextDouble() < mutationRate)
                             {
-                                neuron.dendrites[i].Weight *= (random.NextDouble() * (1.5 - .5)) + .5;//scale weight
-                            }
-                            else
-                            {
-                                neuron.dendrites[i].Weight *= -1;
+                                if (random.Next(2) == 0)
+                                {
+                                    neuron.dendrites[i].Weight *= (random.NextDouble() * (1.5 - .5)) + .5;//scale weight
+                                }
+                                else
+                                {
+                                    neuron.dendrites[i].Weight *= -1;
+                                }
                             }
                         }
                     }
@@ -68,7 +90,10 @@ namespace NeuralNetworks
                     Neuron winNeuron = winLayer.Neurons[j];
                     Neuron childNeuron = childLayer.Neurons[j];
 
-                    winNeuron.dendrites.CopyTo(childNeuron.dendrites, 0);
+                    if (winNeuron.dendrites != null)
+                    {
+                        winNeuron.dendrites.CopyTo(childNeuron.dendrites, 0);
+                    }
                     childNeuron.bias = winNeuron.bias;
                 }
             }
@@ -92,7 +117,7 @@ namespace NeuralNetworks
             //Removes the worst performing networks
             for (int i = end; i < population.Length; i++)
             {
-                population[i].net.Randomize(random);
+                population[i].net.Randomize(random, min, max);
             }
         }
 

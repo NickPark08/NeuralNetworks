@@ -35,7 +35,7 @@ namespace NeuralNetworks
             {
                 layers[0].Neurons[i].Output = inputs[i];
             }
-            for(int i = 0; i < layers.Length; i++)
+            for(int i = 1; i < layers.Length; i++)
             {
                 output = layers[i].Compute();
             }

@@ -16,32 +16,32 @@ namespace NeuralNetworks
 
         public Neuron(ActivationFunction activation, Neuron[] previousNeurons)
         {
-            dendrites = new Dendrite[previousNeurons.Length];
-            Activation = activation;
-            for(int i = 0; i < previousNeurons.Length; i++)
+            if (previousNeurons != null)
             {
-                for (int j = 0; j < previousNeurons.Length; j++)
+                dendrites = new Dendrite[previousNeurons.Length];
+                for (int i = 0; i < dendrites.Length; i++)
                 {
-                    if (j != i)
-                    {
-                        dendrites[i] = new Dendrite(previousNeurons[i], previousNeurons[j], 0);
-                    }
+                    dendrites[i] = new Dendrite(previousNeurons[i], this, 0);
                 }
             }
+            Activation = activation;
         }
         public void Randomize(Random random, double min, double max)
         {
             bias = (random.NextDouble() * (max - min)) + min;
 
-            foreach(var dendrite in dendrites)
+            if (dendrites != null)
             {
-                dendrite.Weight = (random.NextDouble() * (max - min)) + min;
+                foreach (var dendrite in dendrites)
+                {
+                    dendrite.Weight = (random.NextDouble() * (max - min)) + min;
+                }
             }
         }
         public double Compute()
         {
             Input = 0;
-            for(int i = 0; i < dendrites.Length; i++)
+            for (int i = 0; i < dendrites.Length; i++)
             {
                 Input += dendrites[i].Weight * dendrites[i].Previous.Output;
             }
