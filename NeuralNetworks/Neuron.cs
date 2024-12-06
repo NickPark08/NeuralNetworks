@@ -40,12 +40,11 @@ namespace NeuralNetworks
         }
         public double Compute()
         {
-            Input = 0;
+            Input = bias;
             for (int i = 0; i < dendrites.Length; i++)
             {
-                Input += dendrites[i].Weight * dendrites[i].Previous.Output;
+                Input += dendrites[i].Compute();
             }
-            Input += bias;
 
             Output = Activation.Function(Input);
 

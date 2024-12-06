@@ -35,7 +35,7 @@ namespace NeuralNetworks
         }
         public double[] Compute()
         {
-            for (int i = 0; i < Outputs.Length; i++)
+            for (int i = 0; i < Neurons.Length; i++)
             {
                 Outputs[i] = Neurons[i].Compute();
             }

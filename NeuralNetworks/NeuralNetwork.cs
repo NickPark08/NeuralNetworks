@@ -11,14 +11,15 @@ namespace NeuralNetworks
         public Layer[] layers;
         ErrorFunction errorFunc;
 
-        public NeuralNetwork(ActivationFunction activation, ErrorFunction errorFunc, params int[] neuronsPerLayer)
+        public NeuralNetwork(ActivationFunction activation, ErrorFunction error, params int[] neuronsPerLayer)
         {
-            this.errorFunc = errorFunc;
+            errorFunc = error;
             layers = new Layer[neuronsPerLayer.Length];
-            layers[0] = new Layer(activation, neuronsPerLayer[0], null);
-            for (int i = 1; i < layers.Length; i++)
+            Layer previousLayer = null;
+            for (int i = 0; i < layers.Length; i++)
             {
-                layers[i] = new Layer(activation, neuronsPerLayer[i], layers[i-1]);
+                layers[i] = new Layer(activation, neuronsPerLayer[i], previousLayer);
+                previousLayer = layers[i];
             }
         }
         public void Randomize(Random random, double min, double max) 
@@ -31,10 +32,11 @@ namespace NeuralNetworks
         public double[] Compute(double[] inputs) 
         {
             double[] output = new double[layers[0].Outputs.Length];
-            for(int i = 0; i < layers[0].Outputs.Length; i++)
+            for(int i = 0; i < layers[0].Neurons.Length; i++)
             {
                 layers[0].Neurons[i].Output = inputs[i];
             }
+
             for(int i = 1; i < layers.Length; i++)
             {
                 output = layers[i].Compute();
@@ -45,11 +47,11 @@ namespace NeuralNetworks
         {
             double sum = 0;
             double[] computedInputs = Compute(inputs);
-            for (int i = 0; i < inputs.Length; i++)
+            for (int i = 0; i < computedInputs.Length; i++)
             {
-                sum += errorFunc.Function(inputs[i], desiredOutputs[i]);
+                sum += errorFunc.Function(computedInputs[i], desiredOutputs[i]);
             }
-            return sum / desiredOutputs.Length;
+            return sum;
         }
     }
 }
