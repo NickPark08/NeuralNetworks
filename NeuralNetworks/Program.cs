@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Transactions;
 
 namespace NeuralNetworks
@@ -9,8 +10,8 @@ namespace NeuralNetworks
 
         static void Main(string[] args)
         {
-            GeneticGates network = new GeneticGates(0, 1, 50);
-            Random random = new Random();
+            Random random = new Random(1);
+            GeneticGates network = new GeneticGates(0, 1, 50, random);
             double currentError = double.MaxValue;
             //double[][] inputs = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
             double[][] inputs = [[0, 0], [0, 1], [1, 0], [1, 1]];
@@ -25,18 +26,31 @@ namespace NeuralNetworks
                 for(int i = 0; i < population.Length; i++)
                 {
                     double fitness = network.Fitness(network.networks[i], inputs, outputs);
-                    if(fitness >= -.2)
+                    population[i] = (network.networks[i], fitness);
+                    if (fitness > 0)
                     {
                         winner = network.networks[i];
                         running = false;
-                        break;
                     }
-                    population[i] = (network.networks[i], fitness);
+                   
+                    ;
                 }
-                network.Train(population, random, 0.001);
+                network.Train(population, random, 0.1);
+                winner = network.networks[0];
+                DisplayWinner();
+                //Console.WriteLine(winner.Compute(inputs[0])[0]);
             }
 
-            Console.WriteLine(winner.Compute(inputs[0]));
+            void DisplayWinner()
+            {
+                Console.WriteLine("-");
+                for (int i = 0; i < inputs.Length; i++)
+                {
+                    Console.WriteLine(winner.Compute(inputs[i])[0]);
+                }
+                Console.WriteLine("-");
+            }
+           
         }
 
     

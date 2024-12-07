@@ -11,7 +11,7 @@ namespace NeuralNetworks
         public Layer[] layers;
         ErrorFunction errorFunc;
 
-        public NeuralNetwork(ActivationFunction activation, ErrorFunction error, params int[] neuronsPerLayer)
+        public NeuralNetwork(ActivationFunction activation, ErrorFunction error, Random random, params int[] neuronsPerLayer)
         {
             errorFunc = error;
             layers = new Layer[neuronsPerLayer.Length];
@@ -21,6 +21,7 @@ namespace NeuralNetworks
                 layers[i] = new Layer(activation, neuronsPerLayer[i], previousLayer);
                 previousLayer = layers[i];
             }
+            Randomize(random, 0, 1);
         }
         public void Randomize(Random random, double min, double max) 
         {
@@ -51,7 +52,7 @@ namespace NeuralNetworks
             {
                 sum += errorFunc.Function(computedInputs[i], desiredOutputs[i]);
             }
-            return sum;
+            return sum / desiredOutputs.Length;
         }
     }
 }

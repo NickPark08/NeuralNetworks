@@ -12,22 +12,24 @@ namespace NeuralNetworks
         double min;
         double max;
         public NeuralNetwork[] networks;
-        public GeneticGates(double min, double max, int netCount)
+        public GeneticGates(double min, double max, int netCount, Random random)
         {
             this.min = min;
             this.max = max;
             networks = new NeuralNetwork[netCount];
             for(int i = 0; i < networks.Length; i++)
             {
-                networks[i] = new NeuralNetwork(ActivationFunctions.Sigmoid, ErrorFunctions.MSE, [2, 1, 1]);
+                networks[i] = new NeuralNetwork(ActivationFunctions.BinaryStep, ErrorFunctions.MSE, random, [2, 3,1]);
+                ;
             }
+            ;
         }
 
 
         public double Fitness(NeuralNetwork network, double[][] inputs, double[] desiredOutputs)
         {
             double sum = 0;
-            for(int i = 0; i < inputs.Length; i++)
+            for (int i = 0; i < inputs.Length; i++)
             {
                 sum += -network.GetError(inputs[i], desiredOutputs);
             }
@@ -93,6 +95,8 @@ namespace NeuralNetworks
                     if (winNeuron.dendrites != null)
                     {
                         winNeuron.dendrites.CopyTo(childNeuron.dendrites, 0);
+                        //make own CopyTo
+                        //literally make new array and set each value from specific index
                     }
                     childNeuron.bias = winNeuron.bias;
                 }
@@ -111,6 +115,7 @@ namespace NeuralNetworks
             for (int i = start; i < end; i++)
             {
                 Crossover(population[random.Next(start)].net, population[i].net, random);
+                ;
                 Mutate(population[i].net, random, mutationRate);
             }
 
