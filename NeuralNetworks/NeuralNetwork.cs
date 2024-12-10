@@ -15,7 +15,7 @@ namespace NeuralNetworks
         {
             errorFunc = error;
             layers = new Layer[neuronsPerLayer.Length];
-            Layer previousLayer = null;
+            Layer previousLayer = default;
             for (int i = 0; i < layers.Length; i++)
             {
                 layers[i] = new Layer(activation, neuronsPerLayer[i], previousLayer);
@@ -44,15 +44,15 @@ namespace NeuralNetworks
             }
             return output;
         }
-        public double GetError(double[] inputs, double[] desiredOutputs) 
+        public double GetError(double[] inputs, double desiredOutput) 
         {
             double sum = 0;
             double[] computedInputs = Compute(inputs);
             for (int i = 0; i < computedInputs.Length; i++)
             {
-                sum += errorFunc.Function(computedInputs[i], desiredOutputs[i]);
+                sum += errorFunc.Function(computedInputs[i], desiredOutput);
             }
-            return sum / desiredOutputs.Length;
+            return sum;
         }
     }
 }
