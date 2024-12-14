@@ -11,29 +11,34 @@ namespace NeuralNetworks
     {
         double min;
         double max;
-        public NeuralNetwork[] networks;
+        public int NetCount;
         public GeneticGates(double min, double max, int netCount, Random random)
         {
             this.min = min;
             this.max = max;
-            networks = new NeuralNetwork[netCount];
-            for(int i = 0; i < networks.Length; i++)
-            {
-                networks[i] = new NeuralNetwork(ActivationFunctions.BinaryStep, ErrorFunctions.MSE, random, [2, 3, 1]);
-                ;
-            }
-            ;
+            NetCount = netCount;
+            //networks = new NeuralNetwork[netCount];
+            //for(int i = 0; i < networks.Length; i++)
+            //{
+            //    networks[i] = new NeuralNetwork(ActivationFunctions.BinaryStep, ErrorFunctions.MSE, random, [2, 3, 1]);
+            //    ;
+            //}
+            //;
         }
-
+        
 
         public double Fitness(NeuralNetwork network, double[][] inputs, double[] desiredOutputs)
         {
             double sum = 0;
             for (int i = 0; i < inputs.Length; i++)
             {
-                sum += -network.GetError(inputs[i], desiredOutputs[i]);
+                if (network.Compute(inputs[i])[0] == desiredOutputs[i])
+                {
+                    sum++;
+                }
             }
-            return sum / inputs.Length;
+            
+            return sum;
         }
 
         public void Mutate(NeuralNetwork net, Random random, double mutationRate)
@@ -97,7 +102,9 @@ namespace NeuralNetworks
 
                             for (int k = 0; k < winNeuron.dendrites.Length; k++)
                             {
-                                childNeuron.dendrites[k] = winNeuron.dendrites[k];
+                                childNeuron.dendrites[k].Weight = winNeuron.dendrites[k].Weight;
+
+
                             }
 
                             //literally make new array and set each value from specific index
@@ -116,7 +123,7 @@ namespace NeuralNetworks
                         {
                             for (int k = 0; k < winNeuron.dendrites.Length; k++)
                             {
-                                childNeuron.dendrites[k] = winNeuron.dendrites[k];
+                                childNeuron.dendrites[k].Weight = winNeuron.dendrites[k].Weight;
                             }
                         }
                         childNeuron.bias = winNeuron.bias;
@@ -125,24 +132,25 @@ namespace NeuralNetworks
             }
         }
 
-        public void Train((NeuralNetwork net, double fitness)[] population, Random random, double mutationRate)
+        public Population[] Train(Population[] population, Random random, double mutationRate)
         {
-            Array.Sort(population, (a, b) => b.fitness.CompareTo(a.fitness));
+            Array.Sort(population, (a, b) => b.Fitness.CompareTo(a.Fitness));
 
             int start = (int)(population.Length * 0.1);
             int end = (int)(population.Length * 0.9);
 
             for (int i = start; i < end; i++)
             {
-                Crossover(population[random.Next(start)].net, population[i].net, random);
+                Crossover(population[random.Next(start)].Network, population[i].Network, random);
                 ;
-                Mutate(population[i].net, random, mutationRate);
+                Mutate(population[i].Network, random, mutationRate);
             }
 
             for (int i = end; i < population.Length; i++)
             {
-                population[i].net.Randomize(random, min, max);
+                population[i].Network.Randomize(random, min, max);
             }
+            return population;
         }
 
     }

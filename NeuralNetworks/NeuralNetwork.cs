@@ -44,15 +44,6 @@ namespace NeuralNetworks
             }
             return output;
         }
-        public double GetError(double[] inputs, double desiredOutput) 
-        {
-            double sum = 0;
-            double[] computedInputs = Compute(inputs);
-            for (int i = 0; i < computedInputs.Length; i++)
-            {
-                sum += errorFunc.Function(computedInputs[i], desiredOutput);
-            }
-            return sum;
-        }
+       
     }
 }

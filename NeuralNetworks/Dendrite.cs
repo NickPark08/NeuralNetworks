@@ -18,7 +18,7 @@ namespace NeuralNetworks
             Next = next;
             Weight = weight;
         }
-
+       
         public double Compute()
         {
             return Previous.Output * Weight;
