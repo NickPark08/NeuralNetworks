@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworks
 {
-    public class GeneticGates
+    public class Genetics
     {
         double min;
         double max;
         public int NetCount;
-        public GeneticGates(double min, double max, int netCount, Random random)
+        public Genetics(double min, double max, int netCount, Random random)
         {
             this.min = min;
             this.max = max;
@@ -26,8 +26,12 @@ namespace NeuralNetworks
             //;
         }
         
+        public double FlappyBirdFitness(double time, int score)
+        {
+            return -time / score; // maybe adjust? start training in Game1
+        }
 
-        public double Fitness(NeuralNetwork network, double[][] inputs, double[] desiredOutputs)
+        public double GateFitness(NeuralNetwork network, double[][] inputs, double[] desiredOutputs)
         {
             double sum = 0;
             for (int i = 0; i < inputs.Length; i++)

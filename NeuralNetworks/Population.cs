@@ -10,8 +10,8 @@ namespace NeuralNetworks
     {
         public NeuralNetwork Network;
         public double Fitness;
-        public GeneticGates Genetics;
-        public Population(NeuralNetwork net, double fit, GeneticGates genetics) 
+        public Genetics Genetics;
+        public Population(NeuralNetwork net, double fit, Genetics genetics) 
         {
             Network = net;
             Fitness = fit;

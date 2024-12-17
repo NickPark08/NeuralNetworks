@@ -11,7 +11,7 @@ namespace NeuralNetworks
         static void Main(string[] args)
         {
             Random random = new Random(1);
-            GeneticGates network = new GeneticGates(0, 1, 1000, random);
+            Genetics network = new Genetics(0, 1, 1000, random);
             //double currentError = double.MaxValue;
             //double[][] inputs = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
             double[][] inputs = [[0, 0], [0, 1], [1, 0], [1, 1]];
@@ -29,9 +29,7 @@ namespace NeuralNetworks
             {
                 for (int i = 0; i < population.Length; i++)
                 {
-                    population[i].Fitness = network.Fitness(population[i].Network, inputs, outputs)
-
-                    ;
+                    population[i].Fitness = network.GateFitness(population[i].Network, inputs, outputs);
                 }
                 population = network.Train(population, random, 0.01);
                 Console.WriteLine(population[0].Fitness);

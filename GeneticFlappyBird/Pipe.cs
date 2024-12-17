@@ -14,12 +14,29 @@ namespace GeneticFlappyBird
 {
     public class Pipe
     {
-        Rectangle Top;
-        Rectangle Bottom;
+        public Rectangle Top;
+        public Rectangle Bottom;
+        public int Speed;
+        Random random;
+        public bool passed;
+        public bool dead;
 
-        public Pipe()
+        public Pipe(int speed)
         {
-            Top = new Rectangle();
+            Top = new Rectangle(1500, 0, 100, 0); //250
+            Bottom = new Rectangle(1500, 550, 100, 800); //550
+            Speed = speed;
+            random = new Random();
+            passed = false;
+            dead = false;
+            Randomize(random);
+        }
+        void Randomize(Random gen)
+        {
+            int gap = gen.Next(150, 650);
+            Top.Height = gap - 100;
+            Bottom.Y = gap + 100;
+
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -28,9 +45,11 @@ namespace GeneticFlappyBird
             spriteBatch.FillRectangle(Bottom, Color.Green);
         }
 
-        //public void Randomize()
-        //{
+        public void Move()
+        {
+            Top.X -= Speed;
+            Bottom.X -= Speed;
+        }
 
-        //}
     }
 }
