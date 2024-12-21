@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 using MonoGame.Extended;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace GeneticFlappyBird
 {
@@ -16,12 +17,13 @@ namespace GeneticFlappyBird
     {
         public Rectangle Top;
         public Rectangle Bottom;
-        public int Speed;
+        public float Speed;
         Random random;
         public bool passed;
         public bool dead;
+        public int gap;
 
-        public Pipe(int speed)
+        public Pipe(float speed)
         {
             Top = new Rectangle(1500, 0, 100, 0); //250
             Bottom = new Rectangle(1500, 550, 100, 800); //550
@@ -33,9 +35,9 @@ namespace GeneticFlappyBird
         }
         void Randomize(Random gen)
         {
-            int gap = gen.Next(150, 650);
-            Top.Height = gap - 100;
-            Bottom.Y = gap + 100;
+            gap = gen.Next(150, 650);
+            Top.Height = gap - 200;
+            Bottom.Y = gap + 200;
 
         }
 
@@ -45,10 +47,10 @@ namespace GeneticFlappyBird
             spriteBatch.FillRectangle(Bottom, Color.Green);
         }
 
-        public void Move()
+        public void Move(Bird[] birds)
         {
-            Top.X -= Speed;
-            Bottom.X -= Speed;
+            Top.X -= (int)Speed;
+            Bottom.X -= (int)Speed;
         }
 
     }

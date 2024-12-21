@@ -28,7 +28,7 @@ namespace NeuralNetworks
         
         public double FlappyBirdFitness(double time, int score)
         {
-            return -time / score; // maybe adjust? start training in Game1
+            return -time / (score + 1); // maybe adjust? start training in Game1
         }
 
         public double GateFitness(NeuralNetwork network, double[][] inputs, double[] desiredOutputs)
