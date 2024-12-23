@@ -43,7 +43,7 @@ namespace GeneticFlappyBird
             if (!dead)
             {
                 Hitbox.Center.Y += Speed;
-                Speed += 0.15f;
+                Speed += 0.3f;
 
                 if (jump)
                 {
@@ -66,12 +66,14 @@ namespace GeneticFlappyBird
                     {
                         dead = true;
                         time = gameTime;
+                        Hitbox = new(new(-100, -100), 20);
                     }
                 }
                 if (Hitbox.Center.Y <= -25 || Hitbox.Center.Y >= 800)
                 {
                     dead = true;
                     time = gameTime;
+                    Hitbox = new(new(-100, -100), 20);
                 }
             }
         }

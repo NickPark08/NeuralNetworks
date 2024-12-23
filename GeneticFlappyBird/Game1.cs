@@ -27,7 +27,7 @@ namespace GeneticFlappyBird
         Population[] population;
         Bird[] birds;
         bool birdsDead = true;
-        float speed = 2;
+        float lastSpeed = 2;
         double pipeTime = 4000;
 
         public Game1()
@@ -74,24 +74,24 @@ namespace GeneticFlappyBird
 
             KeyboardState ks = Keyboard.GetState();
 
-            speed += .001f;
-
             if (!gameOver)
             {
                 totalTime += gameTime.ElapsedGameTime.Milliseconds;
                 pipeDelay += gameTime.ElapsedGameTime.Milliseconds;
 
-                pipeTime -= .5;
+                pipeTime -= 2;
+                lastSpeed += .007f;
 
                 if (pipeDelay >= pipeTime)
                 {
                     if (pipes.Count > 0)
                     {
-                        pipes.Add(new Pipe(pipes[0].Speed));
+                        pipes.Add(new Pipe(lastSpeed));
+                        //lastSpeed = pipes[0].Speed;
                     }
                     else
                     {
-                        pipes.Add(new Pipe(2));
+                        pipes.Add(new Pipe(lastSpeed));
                     }
                     pipeDelay = 0;
                 }
@@ -99,8 +99,8 @@ namespace GeneticFlappyBird
 
                 for (int i = pipes.Count - 1; i >= 0; i--)
                 {
-                    pipes[i].Speed += .01f;
-                    pipes[i].Move(birds);
+                    pipes[i].Speed = lastSpeed;
+                    pipes[i].Move();
                     if (pipes[i].dead)
                     {
                         pipes.Remove(pipes[i]);
@@ -155,6 +155,9 @@ namespace GeneticFlappyBird
                 }
                 gameOver = false;
                 birdsDead = false;
+                lastSpeed = 2;
+                pipeTime = 4000;
+                pipeDelay = 5000;
             }
 
             base.Update(gameTime);
@@ -179,7 +182,7 @@ namespace GeneticFlappyBird
                     pipe.Draw(spriteBatch);
                 }
 
-                spriteBatch.DrawString(spriteFont, $"Score: {score}", new(20, 20), Color.Black);
+                //spriteBatch.DrawString(spriteFont, $"Score: {score}", new(20, 20), Color.Black);
             }
 
             else

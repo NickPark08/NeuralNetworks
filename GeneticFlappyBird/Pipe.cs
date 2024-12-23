@@ -47,7 +47,7 @@ namespace GeneticFlappyBird
             spriteBatch.FillRectangle(Bottom, Color.Green);
         }
 
-        public void Move(Bird[] birds)
+        public void Move()
         {
             Top.X -= (int)Speed;
             Bottom.X -= (int)Speed;
