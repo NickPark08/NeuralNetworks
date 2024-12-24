@@ -17,13 +17,17 @@ namespace NeuralNetworks
             this.min = min;
             this.max = max;
             NetCount = netCount;
-            //networks = new NeuralNetwork[netCount];
-            //for(int i = 0; i < networks.Length; i++)
-            //{
-            //    networks[i] = new NeuralNetwork(ActivationFunctions.BinaryStep, ErrorFunctions.MSE, random, [2, 3, 1]);
-            //    ;
-            //}
-            //;
+        }
+
+        public double SineWaveFitness(NeuralNetwork network, double[][] inputs, double[][] outputs)
+        {
+            double sum = 0;
+            for(int i = 0; i < inputs.Length; i++)
+            {
+                sum += -Math.Abs(Math.Sin(inputs[i][0] / 10) - network.Compute(outputs[i])[0]);
+            }
+
+            return sum;
         }
         
         public double FlappyBirdFitness(double time, int score)

@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HillClimberBestFit", "HillC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerceptronLinearClassification", "LinearClassificationPerceptron\PerceptronLinearClassification.csproj", "{2CFBE418-90B1-42C6-BFCB-CD877E8F250E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticFlappyBird", "GeneticFlappyBird\GeneticFlappyBird.csproj", "{BCE55117-8B3F-44C3-95B7-6774B9ABA190}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneticFlappyBird", "GeneticFlappyBird\GeneticFlappyBird.csproj", "{BCE55117-8B3F-44C3-95B7-6774B9ABA190}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticSineWave", "GeneticSineWave\GeneticSineWave.csproj", "{7D2A5F40-741F-4B4B-AD90-8964DDF6EA47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{BCE55117-8B3F-44C3-95B7-6774B9ABA190}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCE55117-8B3F-44C3-95B7-6774B9ABA190}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCE55117-8B3F-44C3-95B7-6774B9ABA190}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D2A5F40-741F-4B4B-AD90-8964DDF6EA47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D2A5F40-741F-4B4B-AD90-8964DDF6EA47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D2A5F40-741F-4B4B-AD90-8964DDF6EA47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D2A5F40-741F-4B4B-AD90-8964DDF6EA47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
