@@ -12,6 +12,8 @@ namespace NeuralNetworks
         public Dendrite[] dendrites;
         public double Output { get; set; }
         public double Input { get; private set; }
+        public double Delta { get; set; }
+        double biasUpdate;
         public ActivationFunction Activation { get; set; }
 
         public Neuron(ActivationFunction activation, Neuron[] previousNeurons)

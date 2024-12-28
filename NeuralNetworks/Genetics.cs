@@ -24,11 +24,11 @@ namespace NeuralNetworks
             double sum = 0;
             for (int i = 0; i < inputs.Length; i++)
             {
-                double target = Math.Sin(inputs[i][0] / 10.0); 
-                double prediction = network.Compute(inputs[i])[0]; 
-                sum += -Math.Abs(target - prediction); 
+                double target = Math.Sin(inputs[i][0]/* / 10.0*/);
+                double prediction = network.Compute(inputs[i])[0];
+                sum += -Math.Pow(target - prediction, 2);
             }
-            return sum / inputs.Length;
+            return sum;// / inputs.Length;
         }
 
 
@@ -47,7 +47,7 @@ namespace NeuralNetworks
                     sum++;
                 }
             }
-            
+
             return sum;
         }
 
@@ -57,38 +57,35 @@ namespace NeuralNetworks
             {
                 foreach (Neuron neuron in layer.Neurons)
                 {
-                    if(neuron.dendrites != null)
+                    if (neuron.dendrites != null)
                     {
                         for (int i = 0; i < neuron.dendrites.Length; i++)
                         {
-                            if (random.NextDouble() < mutationRate)
-                            {
-                                if (random.Next(2) == 0)
-                                {
-                                    neuron.dendrites[i].Weight += random.NextDouble();
-                                }
-                                else
-                                {
-                                    neuron.dendrites[i].Weight *= -1;
-                                }
-                            }
+                            //if (random.Next(2) == 0)
+                            //{
+                            neuron.dendrites[i].Weight += NextDouble(random, -mutationRate, mutationRate);
+                            //}
+                            //else
+                            //{
+                            //    neuron.dendrites[i].Weight *= -1;
+                            //}
                         }
                     }
 
-                    if (random.NextDouble() < mutationRate)
-                    {
-                        if (random.Next(2) == 0)
-                        {
-                            neuron.bias += random.NextDouble();//(random.NextDouble() * (1.5 - .5)) + .5;
-                        }
-                        else
-                        {
-                            neuron.bias *= -1;
-                        }
-                    }
+                    //if (random.Next(2) == 0)
+                    //{
+                        neuron.bias += NextDouble(random, -mutationRate, mutationRate);
+                    //}
+                    //else
+                    //{
+                    //    neuron.bias *= -1;
+                    //}
                 }
             }
         }
+
+        private double NextDouble(Random randy, double min, double max) => (randy.NextDouble() * (max - min)) + min;
+
         public void Crossover(NeuralNetwork winner, NeuralNetwork loser, Random random)
         {
             for (int i = 0; i < winner.layers.Length; i++)

@@ -42,22 +42,22 @@ namespace GeneticSineWave
             spriteBatch = new SpriteBatch(GraphicsDevice);
             random = new Random();
 
-            genetics = new Genetics(0, 1, 100, random);
+            genetics = new Genetics(0, 1, 500, random);
             population = new Population[genetics.NetCount];
 
             int width = GraphicsDevice.Viewport.Width;
-            inputs = new double[width][];
-            outputs = new double[width][];
-            for (int i = 0; i < width; i++)
+            inputs = new double[(int)(width / (Math.PI / 32 * 100))][];
+            outputs = new double[(int)(width / (Math.PI / 32 * 100))][];
+            for (int i = 0; i < inputs.Length; i++)
             {
-                inputs[i] = [ i / 100.0 ];
-                outputs[i] = [ Math.Sin(inputs[i][0]) ];
+                inputs[i] = [Math.PI / 32 * i];
+                outputs[i] = [Math.Sin(inputs[i][0])];
             }
 
             for (int i = 0; i < population.Length; i++)
             {
                 population[i] = new Population(
-                    new NeuralNetwork(ActivationFunctions.Sigmoid, ErrorFunctions.MSE, random, [ 1, 3, 1 ]),
+                    new NeuralNetwork(ActivationFunctions.Sigmoid, ErrorFunctions.MSE, random, [ 1, 7, 1 ]),
                     double.MaxValue,
                     genetics
                 );
@@ -70,15 +70,16 @@ namespace GeneticSineWave
                 Exit();
 
             //check fitness
-            if (population.Any(p => p.Fitness > 0.01))
+            //if (population.Any(p => p.Fitness != 0))
+            //{
+            foreach (var pop in population)
             {
-                foreach (var pop in population)
-                {
-                    pop.Fitness = genetics.SineWaveFitness(pop.Network, inputs, outputs);
-                }
-
-                genetics.Train(population, random, 0.01);
+                pop.Fitness = genetics.SineWaveFitness(pop.Network, inputs, outputs);
             }
+            Console.WriteLine(population[0].Fitness);
+
+            genetics.Train(population, random, 0.3);
+            //}
 
             base.Update(gameTime);
         }
@@ -98,6 +99,8 @@ namespace GeneticSineWave
                 spriteBatch.DrawPoint(new Vector2(x, actualY), Color.Black, 3);
 
                 spriteBatch.DrawPoint(new Vector2(x, predictedY), Color.Red, 3);
+                spriteBatch.DrawLine(new Vector2((float)(Math.PI / 2) *100, 0), 800, (float)(Math.PI / 2), Color.Green, 3);
+
             }
 
             spriteBatch.End();

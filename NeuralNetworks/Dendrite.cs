@@ -11,6 +11,7 @@ namespace NeuralNetworks
         public Neuron Previous { get; set; }
         public Neuron Next { get; set; }
         public double Weight { get; set; }
+        public double WeightUpdate { get; set; }
 
         public Dendrite(Neuron previous, Neuron next, double weight)
         {
