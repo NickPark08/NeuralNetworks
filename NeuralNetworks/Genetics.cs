@@ -22,14 +22,16 @@ namespace NeuralNetworks
         public double SineWaveFitness(NeuralNetwork network, double[][] inputs, double[][] outputs)
         {
             double sum = 0;
-            for(int i = 0; i < inputs.Length; i++)
+            for (int i = 0; i < inputs.Length; i++)
             {
-                sum += -Math.Abs(Math.Sin(inputs[i][0] / 10) - network.Compute(outputs[i])[0]);
+                double target = Math.Sin(inputs[i][0] / 10.0); 
+                double prediction = network.Compute(inputs[i])[0]; 
+                sum += -Math.Abs(target - prediction); 
             }
-
-            return sum;
+            return sum / inputs.Length;
         }
-        
+
+
         public double FlappyBirdFitness(double time, int score)
         {
             return -time / (score + 1); // maybe adjust? start training in Game1
