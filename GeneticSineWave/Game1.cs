@@ -69,7 +69,7 @@ namespace GeneticSineWave
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            //check fitness
+            //check fitness, check only middle
             //if (population.Any(p => p.Fitness != 0))
             //{
             foreach (var pop in population)
