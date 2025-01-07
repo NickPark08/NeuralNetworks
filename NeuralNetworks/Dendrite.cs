@@ -24,5 +24,10 @@ namespace NeuralNetworks
         {
             return Previous.Output * Weight;
         }
+        public void ApplyUpdate()
+        {
+            Weight += WeightUpdate;
+            WeightUpdate = 0;
+        }
     }
 }

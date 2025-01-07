@@ -11,6 +11,7 @@ namespace NeuralNetworks
         public Neuron[] Neurons { get; }
         public double[] Outputs { get; }
 
+
         public Layer(ActivationFunction activation, int neuronCount, Layer previousLayer)
         {
             Neurons = new Neuron[neuronCount];
@@ -40,6 +41,20 @@ namespace NeuralNetworks
                 Outputs[i] = Neurons[i].Compute();
             }
             return Outputs;
+        }
+        public void ApplyUpdate()
+        {
+            foreach(var neuron in Neurons)
+            {
+                neuron.ApplyUpdate();
+            }
+        }
+        public void Backprop(double learningRate)
+        {
+            foreach(var neuron in Neurons)
+            {
+                neuron.Backprop(learningRate);
+            }
         }
     }
 }

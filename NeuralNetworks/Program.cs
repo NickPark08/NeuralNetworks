@@ -10,51 +10,29 @@ namespace NeuralNetworks
 
         static void Main(string[] args)
         {
-            Random random = new Random(1);
-            Genetics network = new Genetics(0, 1, 1000, random);
-            //double currentError = double.MaxValue;
-            //double[][] inputs = [[0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 1]];
-            double[][] inputs = [[0, 0], [0, 1], [1, 0], [1, 1]];
+            Random random = new Random();
+            NeuralNetwork network = new NeuralNetwork(ActivationFunctions.BinaryStep, ErrorFunctions.MSE, random, [2, 2, 1]);
+            double error = double.MaxValue;
 
-            double[] outputs = [0, 0, 0, 1];
-            Population[] population = new Population[network.NetCount];
-            NeuralNetwork winner = null;
-            bool running = true;
+            double[][] inputs = { [0, 0], [0, 1], [1, 0], [1, 1] };
+            double[][] outputs = { [0], [1], [1], [0] };
 
-            for (int i = 0; i < population.Length; i++)
+            while(error >= .5)
             {
-                population[i] = new Population(new NeuralNetwork(ActivationFunctions.BinaryStep, ErrorFunctions.MSE, random, [2, 3, 1]), double.MaxValue, network);
+                error = network.Train(inputs, outputs, .1);
+                Console.WriteLine(error);
             }
-            while (running)
-            {
-                for (int i = 0; i < population.Length; i++)
-                {
-                    population[i].Fitness = network.GateFitness(population[i].Network, inputs, outputs);
-                }
-                population = network.Train(population, random, 0.01);
-                Console.WriteLine(population[0].Fitness);
-                if (population[0].Fitness == outputs.Length)
-                {
-                    winner = population[0].Network;
-                    running = false;
-                }
-            }
+            DisplayWinners();
 
-            DisplayWinner();
-
-            void DisplayWinner()
+            void DisplayWinners()
             {
-                Console.WriteLine("-");
+                Console.WriteLine("---------");
                 for (int i = 0; i < inputs.Length; i++)
                 {
-                    var test = winner.Compute(inputs[i]);
-                    Console.WriteLine($"{inputs[i][0]}, {inputs[i][1]}: {test[0]} Expected: {outputs[i]}");
+                    Console.WriteLine(network.Compute(inputs[i])[0]);
                 }
-                Console.WriteLine("-");
+                Console.WriteLine("---------");
             }
-
         }
-
-
     }
 }
