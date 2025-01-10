@@ -17,9 +17,9 @@ namespace NeuralNetworks
             double[][] inputs = { [0, 0], [0, 1], [1, 0], [1, 1] };
             double[][] outputs = { [0], [1], [1], [0] };
 
-            while(error >= .5)
+            while(error > .5)
             {
-                error = network.Train(inputs, outputs, .1);
+                error = network.Train(inputs, outputs, .001);
                 Console.WriteLine(error);
             }
             DisplayWinners();

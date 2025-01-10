@@ -57,7 +57,7 @@ namespace NeuralNetworks
             Layer outputLayer = layers[layers.Length - 1];
             for(int i = 0; i < outputLayer.Neurons.Length; i++)
             {
-                outputLayer.Neurons[i].Delta += errorFunc.Derivative(outputLayer.Neurons[i].Output, desiredOutputs[i]);
+                outputLayer.Neurons[i].Delta = errorFunc.Derivative(outputLayer.Neurons[i].Output, desiredOutputs[i]);
             }
 
             for(int i = layers.Length - 1; i > 0; i--)

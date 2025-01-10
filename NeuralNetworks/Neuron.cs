@@ -54,6 +54,8 @@ namespace NeuralNetworks
         }
         public void ApplyUpdate()
         {
+            bias += biasUpdate;
+            biasUpdate = 0; 
             if (dendrites != null)
             {
                 foreach (var dendrite in dendrites)
@@ -61,15 +63,13 @@ namespace NeuralNetworks
                     dendrite.ApplyUpdate();
                 }
             }
-            bias += biasUpdate;
-            biasUpdate = 0;
         }
 
         public void Backprop(double learningRate)
         {
             for(int i = 0; i < dendrites.Length; i++)
             {
-                dendrites[i].Previous.Delta += learningRate * -(Delta * Activation.Derivative(Input) * dendrites[i].Weight);
+                dendrites[i].Previous.Delta += Delta * Activation.Derivative(Input) * dendrites[i].Weight;
                 dendrites[i].WeightUpdate += learningRate * -(Delta * Activation.Derivative(Input) * dendrites[i].Previous.Output);
             }
             biasUpdate += learningRate * -(Delta * Activation.Derivative(Input));
