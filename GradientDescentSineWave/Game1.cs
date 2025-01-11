@@ -3,23 +3,22 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 using MonoGame.Extended;
-
 using NeuralNetworks;
 
 using System;
 using System.Linq;
 
-namespace GeneticSineWave
+namespace GradientDescentSineWave
 {
     public class Game1 : Game
     {
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        private Genetics genetics;
-        private Population[] population;
-        private Random random;
+        NeuralNetwork network;
+        Random random;
         private double[][] inputs;
         private double[][] outputs;
+        private double[][] newInputs;
 
         public Game1()
         {
@@ -41,26 +40,22 @@ namespace GeneticSineWave
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             random = new Random();
-
-            genetics = new Genetics(0, 1, 500, random);
-            population = new Population[genetics.NetCount];
+            network = new NeuralNetwork(ActivationFunctions.TanH, ErrorFunctions.MSE, random, .01, [1, 5, 5, 5, 1]);
 
             int width = GraphicsDevice.Viewport.Width;
             inputs = new double[(int)(width / (Math.PI / 32 * 100))][];
             outputs = new double[(int)(width / (Math.PI / 32 * 100))][];
+            newInputs = new double[inputs.Length / 2][]; 
             for (int i = 0; i < inputs.Length; i++)
             {
                 inputs[i] = [Math.PI / 32 * i];
                 outputs[i] = [Math.Sin(inputs[i][0])];
             }
-
-            for (int i = 0; i < population.Length; i++)
+            int count = newInputs.Length;
+            for(int i = 0; i < newInputs.Length; i++)
             {
-                population[i] = new Population(
-                    new NeuralNetwork(ActivationFunctions.Sigmoid, ErrorFunctions.MSE, random, .01, [ 1, 7, 1 ]),
-                    double.MaxValue,
-                    genetics
-                );
+                newInputs[i] = inputs[count];
+                count++;
             }
         }
 
@@ -69,17 +64,7 @@ namespace GeneticSineWave
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            //check fitness, check only middle
-            //if (population.Any(p => p.Fitness != 0))
-            //{
-            foreach (var pop in population)
-            {
-                pop.Fitness = genetics.SineWaveFitness(pop.Network, inputs, outputs);
-            }
-            Console.WriteLine(population[0].Fitness);
-
-            genetics.Train(population, random, 0.3);
-            //}
+            Console.WriteLine(network.Train(inputs, outputs, .004));
 
             base.Update(gameTime);
         }
@@ -90,16 +75,26 @@ namespace GeneticSineWave
 
             spriteBatch.Begin();
 
-            for (int i = 0; i < inputs.Length; i++)
+            //for (int i = 0; i < inputs.Length; i++)
+            //{
+            //    float x = (float)(inputs[i][0] * 100);
+            //    float actualY = (float)(Math.Sin(inputs[i][0]) * 100 + 400);
+            //    float predictedY = (float)network.Compute(inputs[i])[0] * 100 + 400;
+
+            //    spriteBatch.DrawPoint(new Vector2(x, actualY), Color.Black, 3);
+
+            //    spriteBatch.DrawPoint(new Vector2(x, predictedY), Color.Red, 3);
+
+            //}
+            for (int i = 0; i < newInputs.Length; i++)
             {
-                float x = (float)(inputs[i][0] * 100);
-                float actualY = (float)(Math.Sin(inputs[i][0]) * 100 + 400);
-                float predictedY = (float)(population[0].Network.Compute(inputs[i])[0] * 100 + 400);
+                float x = (float)(newInputs[i][0] * 100);
+                float actualY = (float)(Math.Sin(newInputs[i][0]) * 100 + 400);
+                float predictedY = (float)network.Compute(newInputs[i])[0] * 100 + 400;
 
                 spriteBatch.DrawPoint(new Vector2(x, actualY), Color.Black, 3);
 
                 spriteBatch.DrawPoint(new Vector2(x, predictedY), Color.Red, 3);
-                spriteBatch.DrawLine(new Vector2((float)(Math.PI / 2) *100, 0), 800, (float)(Math.PI / 2), Color.Green, 3);
 
             }
 

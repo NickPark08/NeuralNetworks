@@ -10,11 +10,12 @@ namespace NeuralNetworks
     {
         public Layer[] layers;
         ErrorFunction errorFunc;
-
-        public NeuralNetwork(ActivationFunction activation, ErrorFunction error, Random random, params int[] neuronsPerLayer)
+        double momentum;
+        public NeuralNetwork(ActivationFunction activation, ErrorFunction error, Random random, double moment, params int[] neuronsPerLayer)
         {
             errorFunc = error;
             layers = new Layer[neuronsPerLayer.Length];
+            momentum = moment;
             Layer previousLayer = default;
             for (int i = 0; i < layers.Length; i++)
             {
@@ -47,9 +48,9 @@ namespace NeuralNetworks
 
         public void ApplyUpdate()
         {
-            for(int i = 1; i < layers.Length; i++)
+            for(int i = 0; i < layers.Length; i++)
             {
-                layers[i].ApplyUpdate();
+                layers[i].ApplyUpdate(momentum);
             }
         }
         public void Backprop(double learningRate, double[] desiredOutputs)

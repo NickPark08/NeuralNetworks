@@ -14,6 +14,7 @@ namespace NeuralNetworks
         public double Input { get; private set; }
         public double Delta { get; set; }
         double biasUpdate;
+        double previousBiasUpdate;
         public ActivationFunction Activation { get; set; }
 
         public Neuron(ActivationFunction activation, Neuron[] previousNeurons)
@@ -52,15 +53,17 @@ namespace NeuralNetworks
 
             return Output;
         }
-        public void ApplyUpdate()
+        public void ApplyUpdate(double momentum)
         {
+            biasUpdate += previousBiasUpdate * momentum;
             bias += biasUpdate;
+            previousBiasUpdate = biasUpdate;
             biasUpdate = 0; 
             if (dendrites != null)
             {
                 foreach (var dendrite in dendrites)
                 {
-                    dendrite.ApplyUpdate();
+                    dendrite.ApplyUpdate(momentum);
                 }
             }
         }
@@ -69,10 +72,10 @@ namespace NeuralNetworks
         {
             for(int i = 0; i < dendrites.Length; i++)
             {
+                dendrites[i].WeightUpdate -= learningRate * -(Delta * Activation.Derivative(Input) * dendrites[i].Previous.Output);
                 dendrites[i].Previous.Delta += Delta * Activation.Derivative(Input) * dendrites[i].Weight;
-                dendrites[i].WeightUpdate += learningRate * -(Delta * Activation.Derivative(Input) * dendrites[i].Previous.Output);
             }
-            biasUpdate += learningRate * -(Delta * Activation.Derivative(Input));
+            biasUpdate -= learningRate * -(Delta * Activation.Derivative(Input));
             Delta = 0;
         }
     }

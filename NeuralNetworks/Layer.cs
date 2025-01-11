@@ -42,11 +42,11 @@ namespace NeuralNetworks
             }
             return Outputs;
         }
-        public void ApplyUpdate()
+        public void ApplyUpdate(double momentum)
         {
             foreach(var neuron in Neurons)
             {
-                neuron.ApplyUpdate();
+                neuron.ApplyUpdate(momentum);
             }
         }
         public void Backprop(double learningRate)
