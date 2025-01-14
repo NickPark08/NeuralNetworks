@@ -46,7 +46,7 @@ namespace NeuralNetworks
             return output;
         }
 
-        public void ApplyUpdate()
+        public void ApplyUpdate(double momentum)
         {
             for(int i = 0; i < layers.Length; i++)
             {
@@ -87,7 +87,25 @@ namespace NeuralNetworks
                 Backprop(learningRate, desiredOutputs[i]);
             }
 
-            ApplyUpdate();
+            ApplyUpdate(momentum);
+            return error / inputs.Length;
+        }
+
+        public double BatchTrain(double[][] inputs, double[][] desiredOutputs, int batchSize, double learningRate, double momentum)
+        {
+            double error = 0;
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                if(i % batchSize == 0)
+                {
+                    ApplyUpdate(momentum);
+                }
+
+                error += GetError(inputs[i], desiredOutputs[i]);
+                Backprop(learningRate, desiredOutputs[i]);
+            }
+
+            ApplyUpdate(momentum);
             return error / inputs.Length;
         }
     }

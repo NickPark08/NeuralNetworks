@@ -19,6 +19,8 @@ namespace GradientDescentSineWave
         private double[][] inputs;
         private double[][] outputs;
         private double[][] newInputs;
+        double min;
+        double max;
 
         public Game1()
         {
@@ -40,7 +42,7 @@ namespace GradientDescentSineWave
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             random = new Random();
-            network = new NeuralNetwork(ActivationFunctions.TanH, ErrorFunctions.MSE, random, .01, [1, 5, 5, 5, 1]);
+            network = new NeuralNetwork(ActivationFunctions.TanH, ErrorFunctions.MSE, random, .01, [1, 5, 5, 1]);
 
             int width = GraphicsDevice.Viewport.Width;
             inputs = new double[(int)(width / (Math.PI / 32 * 100))][];
@@ -51,12 +53,10 @@ namespace GradientDescentSineWave
                 inputs[i] = [Math.PI / 32 * i];
                 outputs[i] = [Math.Sin(inputs[i][0])];
             }
-            int count = newInputs.Length;
-            for(int i = 0; i < newInputs.Length; i++)
-            {
-                newInputs[i] = inputs[count];
-                count++;
-            }
+            max = inputs.Max(m => m.Max());
+            min = inputs.Min(m => m.Min());
+
+            inputs = Normalize(inputs);
         }
 
         protected override void Update(GameTime gameTime)
@@ -64,7 +64,7 @@ namespace GradientDescentSineWave
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            Console.WriteLine(network.Train(inputs, outputs, .004));
+            Console.WriteLine(network.BatchTrain(inputs, outputs, 5, .01, .01));
 
             base.Update(gameTime);
         }
@@ -75,32 +75,61 @@ namespace GradientDescentSineWave
 
             spriteBatch.Begin();
 
-            //for (int i = 0; i < inputs.Length; i++)
-            //{
-            //    float x = (float)(inputs[i][0] * 100);
-            //    float actualY = (float)(Math.Sin(inputs[i][0]) * 100 + 400);
-            //    float predictedY = (float)network.Compute(inputs[i])[0] * 100 + 400;
-
-            //    spriteBatch.DrawPoint(new Vector2(x, actualY), Color.Black, 3);
-
-            //    spriteBatch.DrawPoint(new Vector2(x, predictedY), Color.Red, 3);
-
-            //}
-            for (int i = 0; i < newInputs.Length; i++)
+            for (int i = 0; i < inputs.Length; i++)
             {
-                float x = (float)(newInputs[i][0] * 100);
-                float actualY = (float)(Math.Sin(newInputs[i][0]) * 100 + 400);
-                float predictedY = (float)network.Compute(newInputs[i])[0] * 100 + 400;
+                float x = (float)(UnNormalize(inputs[i], max, min)[0] * 100);
+                float actualY = (float)(Math.Sin(UnNormalize(inputs[i], max, min)[0]) * 100 + 400);
+                float predictedY = (float)network.Compute(inputs[i])[0] * 100 + 400;
 
                 spriteBatch.DrawPoint(new Vector2(x, actualY), Color.Black, 3);
 
                 spriteBatch.DrawPoint(new Vector2(x, predictedY), Color.Red, 3);
 
             }
+            //for (int i = 0; i < newInputs.Length; i++)
+            //{
+            //    float x = (float)(newInputs[i][0] * 100);
+            //    float actualY = (float)(Math.Sin(newInputs[i][0]) * 100 + 400);
+            //    float predictedY = (float)network.Compute(newInputs[i])[0] * 100 + 400;
+
+            //    spriteBatch.DrawPoint(new Vector2(x, actualY), Color.Black, 3);
+
+            //    spriteBatch.DrawPoint(new Vector2(x, predictedY), Color.Red, 3);
+
+            //}
 
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        public double[][] Normalize(double[][] inputs)
+        {
+            double max = inputs.Max(m => m.Max());
+            double min = inputs.Min(m => m.Min());
+            double[][] arr = new double[inputs.Length][];
+
+            for (int j = 0; j < inputs.Length; j++)
+            {
+                arr[j] = new double[inputs[j].Length];
+                for (int i = 0; i < inputs[j].Length; i++)
+                {
+                    arr[j][i] = ((inputs[j][i] - min) / (max - min)) * (1 -.1) + .1;
+                }
+            }
+            return arr;
+        }
+
+        public double[] UnNormalize(double[] inputs, double max, double min)
+        {
+            min = 0;
+            double[] arr = new double[inputs.Length];
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                arr[i] = ((inputs[i] - .1) / (1 - .1)) * (max - min) + min;
+            }
+
+            return arr;
         }
     }
 }
