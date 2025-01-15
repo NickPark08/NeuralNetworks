@@ -8,21 +8,26 @@ namespace NeuralNetworks
 {
     class MiniMaxTree<T> where T : IGameState<T>
     {
+        //build tree "nodes"
         class Node
         {
-            int Score;
             T State { get; set; }
-            List<Node> Outcomes = new List<Node>();
+            List<Node> Children = new List<Node>();
+
+            public Node(T state)
+            {
+                State = state;
+            }
+
+
         }
 
+        public void BuildTree(IGameState<T> state)
+        {
+        }
+        public void FindBestMove(IGameState<T> state)
+        {
 
-        //int Minimax(IGameState<T> state, bool isMax)
-        //{
-        //    if(state.isTerminal)
-        //    {
-        //    }
-
-        //    return 0;
-        //}
+        }
     }
 }

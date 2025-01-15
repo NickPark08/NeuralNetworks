@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworks
 {
-    interface IGameState<T> where T : IGameState<T>
+    public interface IGameState<T> where T : IGameState<T>
     {
         int Value { get; }
         bool IsTerminal { get; }
