@@ -10,10 +10,12 @@ namespace MinimaxTicTacToe
     class TicTacToeGameState : IGameState<TicTacToeGameState>
     {
         int[,] board;
-        bool isXTurn = true;
-        public int Value => throw new NotImplementedException();
+        bool isXTurn = true; // X - Maximizer, O - Minimizer
+        public int Value => GetValue();
 
         public bool IsTerminal => Value == -1 || Value == 1;
+
+
         TicTacToeGameState[] children = null;
 
         public TicTacToeGameState(Button[,] buttons)
@@ -29,11 +31,11 @@ namespace MinimaxTicTacToe
                     }
                     else if (buttons[i,j].Text == "X")
                     {
-                        board[i, j] = 1;
+                        board[i, j] = 1; // X
                     }
                     else
                     {
-                        board[i, j] = 2;
+                        board[i, j] = 2; // O
                     }
                 }
             }
@@ -44,6 +46,49 @@ namespace MinimaxTicTacToe
             board = previousBoard;
         }
 
+        private int GetValue()
+        {
+            for(int i = 0; i <  board.GetLength(1); i++)
+            {
+                if (board[i, 0] == 1 && board[i, 1] == 1 && board[i, 2] == 1)
+                {
+                    if(isXTurn)
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        return 1;
+                    }
+                }
+            }
+            for(int i = 0; i < board.GetLength(0); i++)
+            {
+                if (board[0, i] == 1 && board[1, i] == 1 && board[2, i] == 1)
+                {
+                    if(isXTurn)
+                    {
+                        return -1;
+                    }
+                    else
+                    {
+                        return 1;
+                    }
+                }
+            }
+            if ((board[0, 0] == 1 && board[1, 1] == 1 && board[2, 2] == 1) || (board[2, 0] == 1 && board[1, 1] == 1 && board[0, 2] == 1))
+            {
+                if(isXTurn)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
 
         public TicTacToeGameState[] GetChildren()
         {
@@ -60,12 +105,42 @@ namespace MinimaxTicTacToe
                 children = new TicTacToeGameState[count];
                 for(int i = 0; i < count; i++)
                 {
-                    children[i] = new TicTacToeGameState(board);
+                    children[i] = new TicTacToeGameState(PossibleBoard(i));
                     //change one value of each game state to make all different possible outcomes
                 }
             }
 
             return children;
+        }
+        private int[,] PossibleBoard(int count)
+        {
+            int[,] tempBoard = board;
+            int counter = count;
+            for(int i = 0; i < tempBoard.GetLength(1); i++)
+            {
+                for(int j = 0; j < tempBoard.GetLength(0); j++)
+                {
+                    if (tempBoard[i, j] == 0)
+                    {
+                        if(counter == 0)
+                        {
+                            if (isXTurn)
+                            {
+                                tempBoard[i, j] = 1;
+                            }
+                            else
+                            {
+                                tempBoard[i, j] = 2;
+                            }
+                        }
+                        else
+                        {
+                            counter--;
+                        }
+                    }
+                }
+            }
+            return tempBoard;
         }
     }
 }
