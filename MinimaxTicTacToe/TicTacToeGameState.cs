@@ -7,14 +7,14 @@ using NeuralNetworks;
 
 namespace MinimaxTicTacToe
 {
-    class TicTacToeGameState : IGameState<TicTacToeGameState>
+    public class TicTacToeGameState : IGameState<TicTacToeGameState>
     {
         int[,] board;
-        bool isXTurn = true; // X - Maximizer, O - Minimizer
+        public bool isXTurn = true; // X - Maximizer, O - Minimizer
+
         public int Value => GetValue();
 
         public bool IsTerminal => Value == -1 || Value == 1;
-
 
         TicTacToeGameState[] children = null;
 
