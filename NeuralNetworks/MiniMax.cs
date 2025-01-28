@@ -13,11 +13,11 @@ namespace NeuralNetworks
         bool isMax = true;
         public class Node
         {
-            public IGameState<T> State { get; set; }
+            public T State { get; set; }
             public Node[] Children;
             public int Value;
 
-            public Node(IGameState<T> state)
+            public Node(T state)
             {
                 State = state;
                 Value = state.Value;
@@ -70,7 +70,7 @@ namespace NeuralNetworks
                     foreach (var child in node.Children)
                     {
                         isMax = !isMax;
-                        node.Value = Minimax(child, queue);
+                        Minimax(child, queue);
                     };
                     if(isMax)
                     {

@@ -16,7 +16,7 @@ namespace MinimaxTicTacToe
 
         private void Form1_Load(object? sender, EventArgs e)
         {
-            circleTurn = true;
+            circleTurn = false;
             buttons = new Button[3, 3];
             originalState = new TicTacToeGameState(buttons);
             root = new(originalState);
@@ -33,6 +33,7 @@ namespace MinimaxTicTacToe
                     buttons[row, col].BackColor = Color.White;
                     buttons[row, col].Click += OnClick;
                     buttons[row, col].Font = new Font("Times New Roman", 40);
+                    buttons[row, col].Tag = new Point(row, col);
                     Controls.Add(buttons[row, col]);
                     x += 110;
                 }
@@ -45,18 +46,61 @@ namespace MinimaxTicTacToe
         {
             if (sender is not Button button) return;
 
-            //implement tic tac toe
-            minimax.FindBestMove(root);
+            //moves should follow state
 
-            if (circleTurn)
+            if (!circleTurn)
             {
                 button.Text = "X";
+                TicTacToeGameState tempState = new TicTacToeGameState(buttons);
+                foreach(var state in root.Children)
+                {
+                    if (state.State.Equals(tempState))
+                    {
+                        root = state;
+                        break;
+                    }
+                }
+
+                //find which button is pressed
+                //move to the state where it is the same
             }
-            else
+
+            var node = minimax.FindBestMove(root);
+            MiniMax<TicTacToeGameState>.Node bestMove = null;
+
+            foreach (var child in root.Children)
             {
-                button.Text = "O";
+                if (child.Equals(node))
+                {
+                    bestMove = child;
+                    break;
+                }
             }
-            //circleTurn = !circleTurn;
+
+            if (bestMove != null)
+            {
+                root = bestMove;
+                DisplayBoard(root.State.board);
+            }
+            circleTurn = !circleTurn;
+        }
+
+        private void DisplayBoard(int[,] board)
+        {
+            for(int row = 0; row < board.GetLength(1); row++)
+            {
+                for(int col = 0; col < board.GetLength(0); col++)
+                {
+                    if (board[row, col] == 1)
+                    {
+                        buttons[row, col].Text = "X";
+                    }
+                    else if (board[row, col] == 2)
+                    {
+                        buttons[row, col].Text = "O";
+                    }
+                }
+            }
         }
     }
 }

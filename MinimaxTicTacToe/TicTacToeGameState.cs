@@ -9,7 +9,7 @@ namespace MinimaxTicTacToe
 {
     public class TicTacToeGameState : IGameState<TicTacToeGameState>
     {
-        int[,] board;
+        public int[,] board;
         public bool isXTurn = true; // X - Maximizer, O - Minimizer
 
         public int Value => GetValue();
@@ -25,17 +25,20 @@ namespace MinimaxTicTacToe
             {
                 for(int j = 0; j < buttons.GetLength(0); j++)
                 {
-                    if (buttons[i,j].Text == "")
+                    if (buttons[i, j] != null)
                     {
-                        board[i, j] = 0;
-                    }
-                    else if (buttons[i,j].Text == "X")
-                    {
-                        board[i, j] = 1; // X
-                    }
-                    else
-                    {
-                        board[i, j] = 2; // O
+                        if (buttons[i, j].Text == "")
+                        {
+                            board[i, j] = 0;
+                        }
+                        else if (buttons[i, j].Text == "X")
+                        {
+                            board[i, j] = 1; // X
+                        }
+                        else
+                        {
+                            board[i, j] = 2; // O
+                        }
                     }
                 }
             }
@@ -114,7 +117,9 @@ namespace MinimaxTicTacToe
         }
         private int[,] PossibleBoard(int count)
         {
-            int[,] tempBoard = board;
+            int[,] tempBoard = new int[board.GetLength(0), board.GetLength(1)];
+            tempBoard = (int[,])board.Clone();
+            //board.CopyTo(tempBoard, 0);
             int counter = count;
             for(int i = 0; i < tempBoard.GetLength(1); i++)
             {
@@ -132,6 +137,7 @@ namespace MinimaxTicTacToe
                             {
                                 tempBoard[i, j] = 2;
                             }
+                            return tempBoard;
                         }
                         else
                         {
