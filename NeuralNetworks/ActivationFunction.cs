@@ -15,6 +15,8 @@ namespace NeuralNetworks
         {
             function = func;
             derivative = deriv;
+
+            int a = Extensions.Add(5, 10);
         }
 
         public double Function(double input)

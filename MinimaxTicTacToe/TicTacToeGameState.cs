@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using NeuralNetworks;
 
 namespace MinimaxTicTacToe
@@ -21,9 +22,9 @@ namespace MinimaxTicTacToe
         public TicTacToeGameState(Button[,] buttons)
         {
             board = new int[buttons.GetLength(0), buttons.GetLength(1)];
-            for(int i = 0; i < buttons.GetLength(1); i++)
+            for (int i = 0; i < buttons.GetLength(1); i++)
             {
-                for(int j = 0; j < buttons.GetLength(0); j++)
+                for (int j = 0; j < buttons.GetLength(0); j++)
                 {
                     if (buttons[i, j] != null)
                     {
@@ -51,11 +52,11 @@ namespace MinimaxTicTacToe
 
         private int GetValue()
         {
-            for(int i = 0; i <  board.GetLength(1); i++)
+            for (int i = 0; i < board.GetLength(1); i++)
             {
                 if (board[i, 0] == 1 && board[i, 1] == 1 && board[i, 2] == 1)
                 {
-                    if(isXTurn)
+                    if (isXTurn)
                     {
                         return -1;
                     }
@@ -65,11 +66,11 @@ namespace MinimaxTicTacToe
                     }
                 }
             }
-            for(int i = 0; i < board.GetLength(0); i++)
+            for (int i = 0; i < board.GetLength(0); i++)
             {
                 if (board[0, i] == 1 && board[1, i] == 1 && board[2, i] == 1)
                 {
-                    if(isXTurn)
+                    if (isXTurn)
                     {
                         return -1;
                     }
@@ -81,7 +82,7 @@ namespace MinimaxTicTacToe
             }
             if ((board[0, 0] == 1 && board[1, 1] == 1 && board[2, 2] == 1) || (board[2, 0] == 1 && board[1, 1] == 1 && board[0, 2] == 1))
             {
-                if(isXTurn)
+                if (isXTurn)
                 {
                     return -1;
                 }
@@ -95,58 +96,35 @@ namespace MinimaxTicTacToe
 
         public TicTacToeGameState[] GetChildren()
         {
-            if(children == null)
-            {
-                int count = 0;
-                foreach(var val in board)
-                {
-                    if (val == 0)
-                    {
-                        count++;
-                    }
-                }
-                children = new TicTacToeGameState[count];
-                for(int i = 0; i < count; i++)
-                {
-                    children[i] = new TicTacToeGameState(PossibleBoard(i));
-                    //change one value of each game state to make all different possible outcomes
-                }
-            }
+            if (children != null) return children;
 
+            isXTurn = !isXTurn; // ???
+            var possibleBoards = PossibleBoard();
+            children = new TicTacToeGameState[possibleBoards.Length];
+            for(int i = 0; i < children.Length; i++)
+            {
+                children[i] = new TicTacToeGameState(possibleBoards[i]);
+            }
             return children;
         }
-        private int[,] PossibleBoard(int count)
+        private int[][,] PossibleBoard()
         {
-            int[,] tempBoard = new int[board.GetLength(0), board.GetLength(1)];
-            tempBoard = (int[,])board.Clone();
-            //board.CopyTo(tempBoard, 0);
-            int counter = count;
-            for(int i = 0; i < tempBoard.GetLength(1); i++)
+            //implement each gamestate knowing which player turn
+
+            List<int[,]> possibleBoards = new List<int[,]>();
+            int player = isXTurn ? 1 : 2;
+            for (int i = 0; i < board.GetLength(1); i++)
             {
-                for(int j = 0; j < tempBoard.GetLength(0); j++)
+                for(int j = 0; j < board.GetLength(0); j++)
                 {
-                    if (tempBoard[i, j] == 0)
-                    {
-                        if(counter == 0)
-                        {
-                            if (isXTurn)
-                            {
-                                tempBoard[i, j] = 1;
-                            }
-                            else
-                            {
-                                tempBoard[i, j] = 2;
-                            }
-                            return tempBoard;
-                        }
-                        else
-                        {
-                            counter--;
-                        }
-                    }
+                    if (board[i, j] != 0) continue;
+
+                    var tempBoard = (int[,])board.Clone();
+                    tempBoard[i, j] = player;
+                    possibleBoards.Add(tempBoard);
                 }
             }
-            return tempBoard;
+            return possibleBoards.ToArray();
         }
     }
 }

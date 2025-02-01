@@ -8,8 +8,6 @@ namespace NeuralNetworks
 {
     public class MiniMax<T> where T : IGameState<T>
     {
-        //build tree "nodes"
-
         bool isMax = true;
         public class Node
         {
@@ -22,24 +20,24 @@ namespace NeuralNetworks
                 State = state;
                 Value = state.Value;
                 Children = new Node[state.GetChildren().Length];
-                for(int i = 0; i < Children.Length; i++)
-                {
-                    Children[i] = new Node(state.GetChildren()[i]);
-                }
+                //for(int i = 0; i < Children.Length; i++)
+                //{
+                //    Children[i] = new Node(state.GetChildren()[i]);
+                //}
             }
         }
 
         public void BuildTree(Node node)
         {
             Node startNode = new Node(node.State);
-            foreach (var child in startNode.Children)
+            for (int i = 0; i < node.Children.Length; i++)
             {
-                BuildTree(child);
+                node.Children[i] = new Node(node.State.GetChildren()[i]);
+                BuildTree(node.Children[i]);
             }
         }
         public Node FindBestMove(Node node)
         {
-            //BuildTree(node);
             Minimax(node);
 
             node.Children.Order();

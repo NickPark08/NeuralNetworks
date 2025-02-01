@@ -50,39 +50,45 @@ namespace MinimaxTicTacToe
 
             if (!circleTurn)
             {
+                
                 button.Text = "X";
                 TicTacToeGameState tempState = new TicTacToeGameState(buttons);
-                foreach(var state in root.Children)
-                {
-                    if (state.State.Equals(tempState))
+                foreach (var state in root.Children)
+                {                    
+                    if (state.State.board.SequenceEquals(tempState.board))
                     {
                         root = state;
                         break;
                     }
                 }
 
+                circleTurn = !circleTurn;
+
                 //find which button is pressed
                 //move to the state where it is the same
             }
-
-            var node = minimax.FindBestMove(root);
-            MiniMax<TicTacToeGameState>.Node bestMove = null;
-
-            foreach (var child in root.Children)
+            else
             {
-                if (child.Equals(node))
+
+                var node = minimax.FindBestMove(root);
+                MiniMax<TicTacToeGameState>.Node bestMove = null;
+
+                foreach (var child in root.Children)
                 {
-                    bestMove = child;
-                    break;
+                    if (child.Equals(node))
+                    {
+                        bestMove = child;
+                        break;
+                    }
                 }
-            }
 
-            if (bestMove != null)
-            {
-                root = bestMove;
-                DisplayBoard(root.State.board);
+                if (bestMove != null)
+                {
+                    root = bestMove;
+                    DisplayBoard(root.State.board);
+                }
+                circleTurn = !circleTurn;
             }
-            circleTurn = !circleTurn;
         }
 
         private void DisplayBoard(int[,] board)
