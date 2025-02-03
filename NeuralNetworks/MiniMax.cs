@@ -40,8 +40,9 @@ namespace NeuralNetworks
         {
             Minimax(node);
 
-            node.Children.Order();
-            if(isMax)
+            node.Children = node.Children.OrderBy(n => n.Value).ToArray();
+
+            if (isMax)
             {
                 return node.Children[node.Children.Length - 1];
             }
@@ -53,35 +54,36 @@ namespace NeuralNetworks
         public void Minimax(Node node)
         {
             Queue<int> queue = new Queue<int>();
-            Minimax(node, queue);
+            Minimax(node, isMax);
         }
-        private int Minimax(Node node, Queue<int> queue)
+        private int Minimax(Node node, bool maximizingPlayer)
         {
-            if (node != null)
+            if (node.Children.Length == 0) // Terminal node
+                return node.Value;
+
+            if (maximizingPlayer)
             {
-                if (node.Children.Length == 0)
+                int bestValue = int.MinValue;
+                foreach (var child in node.Children)
                 {
-                    return node.Value;
+                    int eval = Minimax(child, false);
+                    bestValue = Math.Max(bestValue, eval);
                 }
-                else
-                {
-                    foreach (var child in node.Children)
-                    {
-                        isMax = !isMax;
-                        Minimax(child, queue);
-                    };
-                    if(isMax)
-                    {
-                        return node.Children.Min(x => x.Value);
-                    }
-                    else
-                    {
-                        return node.Children.Max(x => x.Value);
-                    }
-                }
-                // set state value to min/max of children
+                node.Value = bestValue;
+                return bestValue;
             }
-            return 0;
+            else
+            {
+                int bestValue = int.MaxValue;
+                foreach (var child in node.Children)
+                {
+                    int eval = Minimax(child, true);
+                    bestValue = Math.Min(bestValue, eval);
+                }
+                node.Value = bestValue;
+                return bestValue;
+            }
         }
+
     }
 }

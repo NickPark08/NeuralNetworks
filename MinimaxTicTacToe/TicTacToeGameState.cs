@@ -52,53 +52,30 @@ namespace MinimaxTicTacToe
 
         private int GetValue()
         {
-            for (int i = 0; i < board.GetLength(1); i++)
+            for (int i = 0; i < 3; i++)
             {
-                if (board[i, 0] == 1 && board[i, 1] == 1 && board[i, 2] == 1)
-                {
-                    if (isXTurn)
-                    {
-                        return -1;
-                    }
-                    else
-                    {
-                        return 1;
-                    }
-                }
+                // Rows
+                if (board[i, 0] != 0 && board[i, 0] == board[i, 1] && board[i, 1] == board[i, 2]) return board[i, 0] == 1 ? 1 : -1;
+
+                // Columns
+                if (board[0, i] != 0 && board[0, i] == board[1, i] && board[1, i] == board[2, i]) return board[0, i] == 1 ? 1 : -1;
             }
-            for (int i = 0; i < board.GetLength(0); i++)
-            {
-                if (board[0, i] == 1 && board[1, i] == 1 && board[2, i] == 1)
-                {
-                    if (isXTurn)
-                    {
-                        return -1;
-                    }
-                    else
-                    {
-                        return 1;
-                    }
-                }
-            }
-            if ((board[0, 0] == 1 && board[1, 1] == 1 && board[2, 2] == 1) || (board[2, 0] == 1 && board[1, 1] == 1 && board[0, 2] == 1))
-            {
-                if (isXTurn)
-                {
-                    return -1;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
+
+            // Diagonals
+            if (board[0, 0] != 0 && board[0, 0] == board[1, 1] && board[1, 1] == board[2, 2]) return board[0, 0] == 1 ? 1 : -1;
+
+            if (board[0, 2] != 0 && board[0, 2] == board[1, 1] && board[1, 1] == board[2, 0]) return board[0, 2] == 1 ? 1 : -1;
+
+            // No winner
             return 0;
         }
+
 
         public TicTacToeGameState[] GetChildren()
         {
             if (children != null) return children;
 
-            isXTurn = !isXTurn; // ???
+            //isXTurn = !isXTurn; // ???
             var possibleBoards = PossibleBoard();
             children = new TicTacToeGameState[possibleBoards.Length];
             for(int i = 0; i < children.Length; i++)
