@@ -8,7 +8,7 @@ namespace NeuralNetworks
 {
     public class MiniMax<T> where T : IGameState<T>
     {
-        bool isMax = true;
+        public bool isMax = true;
         public class Node
         {
             public T State { get; set; }
@@ -53,21 +53,19 @@ namespace NeuralNetworks
         }
         public void Minimax(Node node)
         {
-            Queue<int> queue = new Queue<int>();
-            Minimax(node, isMax);
+            node.Value = Minimax(node, isMax);
         }
-        private int Minimax(Node node, bool maximizingPlayer)
+        private int Minimax(Node node, bool max)
         {
-            if (node.Children.Length == 0) // Terminal node
-                return node.Value;
+            if (node.Children.Length == 0) return node.Value;
 
-            if (maximizingPlayer)
+            if (max)
             {
                 int bestValue = int.MinValue;
                 foreach (var child in node.Children)
                 {
-                    int eval = Minimax(child, false);
-                    bestValue = Math.Max(bestValue, eval);
+                    int val = Minimax(child, !max);
+                    bestValue = Math.Max(bestValue, val);
                 }
                 node.Value = bestValue;
                 return bestValue;
@@ -77,8 +75,8 @@ namespace NeuralNetworks
                 int bestValue = int.MaxValue;
                 foreach (var child in node.Children)
                 {
-                    int eval = Minimax(child, true);
-                    bestValue = Math.Min(bestValue, eval);
+                    int val = Minimax(child, !max);
+                    bestValue = Math.Min(bestValue, val);
                 }
                 node.Value = bestValue;
                 return bestValue;

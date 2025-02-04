@@ -21,6 +21,7 @@ namespace MinimaxTicTacToe
 
         public TicTacToeGameState(Button[,] buttons)
         {
+            //isXTurn = xTurn;
             board = new int[buttons.GetLength(0), buttons.GetLength(1)];
             for (int i = 0; i < buttons.GetLength(1); i++)
             {
@@ -45,8 +46,9 @@ namespace MinimaxTicTacToe
             }
         }
 
-        public TicTacToeGameState(int[,] previousBoard)
+        public TicTacToeGameState(int[,] previousBoard, bool xTurn)
         {
+            isXTurn = xTurn;
             board = previousBoard;
         }
 
@@ -80,7 +82,7 @@ namespace MinimaxTicTacToe
             children = new TicTacToeGameState[possibleBoards.Length];
             for(int i = 0; i < children.Length; i++)
             {
-                children[i] = new TicTacToeGameState(possibleBoards[i]);
+                children[i] = new TicTacToeGameState(possibleBoards[i], !isXTurn);
             }
             return children;
         }

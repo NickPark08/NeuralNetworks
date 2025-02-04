@@ -21,20 +21,28 @@ namespace MinimaxTicTacToe
             originalState = new TicTacToeGameState(buttons);
             root = new(originalState);
             minimax.BuildTree(root);
+            label1.Size = new(100, 100);
+            label1.Font = new("Times New Roman", 50);
+            label1.Text = "";
+            label2.Size = new(100, 100);
+            label2.Font = new("Times New Roman", 50);
+            label2.Text = "";
             int x = 225;
             int y = 60;
             for (int row = 0; row < buttons.GetLength(1); row++)
             {
                 for (int col = 0; col < buttons.GetLength(0); col++)
                 {
-                    buttons[row, col] = new Button();
-                    buttons[row, col].Location = new Point(x, y);
-                    buttons[row, col].Size = new Size(100, 100);
-                    buttons[row, col].BackColor = Color.White;
-                    buttons[row, col].Click += OnClick;
-                    buttons[row, col].Font = new Font("Times New Roman", 40);
-                    buttons[row, col].Tag = new Point(row, col);
-                    Controls.Add(buttons[row, col]);
+                    var newButton = buttons[row, col] = new Button()
+                    {
+                        Location = new Point(x, y),
+                        Size = new Size(100, 100),
+                        BackColor = Color.White,
+                        Font = new Font("Times New Roman", 40),
+                        Tag = new Point(row, col),
+                    };
+                    newButton.Click += OnClick;
+                    Controls.Add(newButton);
                     x += 110;
                 }
                 y += 110;
@@ -46,15 +54,16 @@ namespace MinimaxTicTacToe
         {
             if (sender is not Button button) return;
 
-            //moves should follow state
+            if (buttons == null || button.Text != "") return;
+
+            minimax.isMax = !circleTurn;
 
             if (!circleTurn)
             {
-                
                 button.Text = "X";
                 TicTacToeGameState tempState = new TicTacToeGameState(buttons);
                 foreach (var state in root.Children)
-                {                    
+                {
                     if (state.State.board.SequenceEquals(tempState.board))
                     {
                         root = state;
@@ -63,19 +72,24 @@ namespace MinimaxTicTacToe
                 }
 
                 circleTurn = !circleTurn;
-
-                //find which button is pressed
-                //move to the state where it is the same
             }
-            else
+            minimax.isMax = !circleTurn;
+
+            if(circleTurn)
             {
+                if (root.Children.Length == 0)
+                {
+                    label1.Text = " T\n  I\n E";
+                    label2.Text = " G\n A\n M\n E";
+                    return;
+                }
 
                 var node = minimax.FindBestMove(root);
                 MiniMax<TicTacToeGameState>.Node bestMove = null;
 
                 foreach (var child in root.Children)
                 {
-                    if (child.Equals(node))
+                    if (child == node)
                     {
                         bestMove = child;
                         break;
@@ -89,13 +103,21 @@ namespace MinimaxTicTacToe
                 }
                 circleTurn = !circleTurn;
             }
+
+            if (root.State.IsTerminal)
+            {
+                buttons = null;
+                string winner = !circleTurn ? "OS" : "XS";
+                label1.Text = winner;
+                label2.Text = " W\n  I\n N";
+            }
         }
 
         private void DisplayBoard(int[,] board)
         {
-            for(int row = 0; row < board.GetLength(1); row++)
+            for (int row = 0; row < board.GetLength(1); row++)
             {
-                for(int col = 0; col < board.GetLength(0); col++)
+                for (int col = 0; col < board.GetLength(0); col++)
                 {
                     if (board[row, col] == 1)
                     {
