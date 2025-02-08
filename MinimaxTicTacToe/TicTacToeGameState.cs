@@ -105,5 +105,20 @@ namespace MinimaxTicTacToe
             }
             return possibleBoards.ToArray();
         }
+
+        public override string ToString()
+        {
+            string result = "\n";
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    var curr = board[i, j];
+                    result += (" " + (curr == 1 ? 'X' : curr == 2 ? 'O' : '_'));
+                }
+                result += "\n";
+            }
+            return result;
+        }
     }
 }

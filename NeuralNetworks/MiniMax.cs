@@ -4,10 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static NeuralNetworks.Zoo;
+
 namespace NeuralNetworks
 {
+    static class Zoo
+    {
+
+
+    }
     public class MiniMax<T> where T : IGameState<T>
     {
+
+        public Node Monkey;
+        public Node Gorilla;
+
         public bool isMax = true;
         public class Node
         {
@@ -27,6 +38,7 @@ namespace NeuralNetworks
             }
         }
 
+        //recursively build tree, and on way back up order children by their values, backpropogate
         public void BuildTree(Node node)
         {
             Node startNode = new Node(node.State);
@@ -34,13 +46,28 @@ namespace NeuralNetworks
             {
                 node.Children[i] = new Node(node.State.GetChildren()[i]);
                 BuildTree(node.Children[i]);
+
+
+                if(node.Children.Length != 0)
+                {
+                    //check why have null child
+                    node.Children = node.Children.OrderBy(n => n.Value).ToArray();
+                    if(isMax)
+                    {
+                        node.Value = node.Children[node.Children.Length - 1].Value;
+                    }
+                    else
+                    {
+                        node.Value = node.Children[node.Children.Length - 1].Value;
+                    }
+                }
             }
         }
         public Node FindBestMove(Node node)
         {
-            Minimax(node);
+            //Minimax(node);
 
-            node.Children = node.Children.OrderBy(n => n.Value).ToArray();
+            //node.Children = node.Children.OrderBy(n => n.Value).ToArray();
 
             if (isMax)
             {
