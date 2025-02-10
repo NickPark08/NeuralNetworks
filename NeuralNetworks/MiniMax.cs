@@ -39,30 +39,24 @@ namespace NeuralNetworks
         }
 
         //recursively build tree, and on way back up order children by their values, backpropogate
-        public void BuildTree(Node node)
+        public void BuildTree(Node node, bool isMax)
         {
-            Node startNode = new Node(node.State);
-            for (int i = 0; i < node.Children.Length; i++)
+            var childrenStates = node.State.GetChildren();
+            node.Children = new Node[childrenStates.Length];
+
+            for (int i = 0; i < childrenStates.Length; i++)
             {
-                node.Children[i] = new Node(node.State.GetChildren()[i]);
-                BuildTree(node.Children[i]);
+                node.Children[i] = new Node(childrenStates[i]);
+                BuildTree(node.Children[i], !isMax);
+            }
 
-
-                if(node.Children.Length != 0)
-                {
-                    //check why have null child
-                    node.Children = node.Children.OrderBy(n => n.Value).ToArray();
-                    if(isMax)
-                    {
-                        node.Value = node.Children[node.Children.Length - 1].Value;
-                    }
-                    else
-                    {
-                        node.Value = node.Children[node.Children.Length - 1].Value;
-                    }
-                }
+            if (node.Children.Length > 0)
+            {
+                node.Children = node.Children.OrderBy(n => n.Value).ToArray();
+                node.Value = isMax ? node.Children[^1].Value : node.Children[0].Value;
             }
         }
+
         public Node FindBestMove(Node node)
         {
             //Minimax(node);
