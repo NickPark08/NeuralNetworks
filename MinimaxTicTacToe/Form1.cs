@@ -20,7 +20,8 @@ namespace MinimaxTicTacToe
             buttons = new Button[3, 3];
             originalState = new TicTacToeGameState(buttons);
             root = new(originalState);
-            minimax.BuildTree(root);
+            minimax.Opossum = new TicTacToeGameState(new int[,] { { 0, 2, 1 }, { 0, 2, 1 }, { 0, 0, 1 } }, false);
+            minimax.BuildTree(root, !circleTurn);
             label1.Size = new(100, 100);
             label1.Font = new("Times New Roman", 50);
             label1.Text = "";

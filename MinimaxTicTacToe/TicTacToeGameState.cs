@@ -120,5 +120,11 @@ namespace MinimaxTicTacToe
             }
             return result;
         }
+
+        public bool Equivalent(object other)
+        {
+
+            return board.SequenceEquals(((TicTacToeGameState)other).board);
+        }
     }
 }
