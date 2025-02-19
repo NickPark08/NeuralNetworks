@@ -74,11 +74,14 @@ namespace NeuralNetworks
                 //pruning
                 if (isMax && node.Children[0].Value > a)
                 {
-                    a = node.Children[0].Value;
+                    //a = node.Children[0].Value;
+                    a = Math.Max(a, node.Children[0].Value);
+                    if (b <= a) break;
                 }
                 else if (!isMax && node.Children[0].Value < b)
                 {
-                    b = node.Children[0].Value;
+                    b = Math.Min(b, node.Children[0].Value);
+                    if (b <= a) break;
                 }
             }
 
