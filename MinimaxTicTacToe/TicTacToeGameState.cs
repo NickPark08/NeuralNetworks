@@ -10,12 +10,13 @@ namespace MinimaxTicTacToe
 {
     public class TicTacToeGameState : IGameState<TicTacToeGameState>
     {
+        Random rand = new(1);
         public int[,] board;
         public bool isXTurn = true; // X - Maximizer, O - Minimizer
 
-        public int Value => GetValue();
+        public int Value => GetValue()/* * 1000 + rand.Next(10)*/;
 
-        public bool IsTerminal => Value == -1 || Value == 1;
+        public bool IsTerminal => GetValue() != 0;
 
         TicTacToeGameState[] children = null;
 
@@ -51,6 +52,7 @@ namespace MinimaxTicTacToe
             isXTurn = xTurn;
             board = previousBoard;
         }
+       
 
         private int GetValue()
         {

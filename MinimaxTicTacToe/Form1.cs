@@ -76,7 +76,7 @@ namespace MinimaxTicTacToe
             }
             minimax.isMax = !circleTurn;
 
-            if(circleTurn)
+            if (circleTurn)
             {
                 if (root.Children.Length == 0)
                 {
@@ -85,7 +85,9 @@ namespace MinimaxTicTacToe
                     return;
                 }
 
+                //TestDepthFirst(minimax.isMax, root);
                 var node = minimax.FindBestMove(root);
+
                 MiniMax<TicTacToeGameState>.Node bestMove = null;
 
                 foreach (var child in root.Children)
@@ -129,6 +131,26 @@ namespace MinimaxTicTacToe
                         buttons[row, col].Text = "O";
                     }
                 }
+            }
+        }
+
+        private void TestDepthFirst(bool max, MiniMax<TicTacToeGameState>.Node node)
+        {
+            if (node == null) return;
+
+            if (max && node.Children.Any(x => x == null) && !node.State.IsTerminal)
+            {
+                ;
+            }
+
+            if (node.Children.Length != 0)
+            {
+        
+                    for (int i = 0; i < node.Children.Length; i++)
+                    {
+                        TestDepthFirst(!max, node.Children[i]);
+                    }
+                
             }
         }
     }

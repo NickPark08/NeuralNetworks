@@ -73,15 +73,14 @@ namespace NeuralNetworks
 
                 if (node.Children.Length > 0 && !node.State.IsTerminal)
                 {
-                    for (int j = node.Children.Length - 1; j > 0; j--)
+                    for (int j = i; j > 0; j--)
                     {
-                        if ((node.Children[j] != null && node.Children[j - 1] != null) && (comparer.Compare(node.Children[j], node.Children[j - 1]) < 0))
+                        if (comparer.Compare(node.Children[j], node.Children[j - 1]) <= 0)
                         {
                             (node.Children[j], node.Children[j - 1]) = (node.Children[j - 1], node.Children[j]);
                         }
                     }
                 }
-                //node.Children.Order();
 
 
                 if (isMax)
@@ -96,28 +95,11 @@ namespace NeuralNetworks
                     if (b <= a)
                         break;
                 }
-                //if (isMax)
-                //{
-                //    node.Value = int.MinValue;
-                //    foreach (var child in node.Children)
-                //    {
-                //        node.Value = Math.Max(node.Value, child.Value);
-                //        a = Math.Max(a, node.Value);
-                //        if (b <= a)
-                //            break; // Beta cutoff
-                //    }
-                //}
-                //else
-                //{
-                //    node.Value = int.MaxValue;
-                //    foreach (var child in node.Children)
-                //    {
-                //        node.Value = Math.Min(node.Value, child.Value);
-                //        b = Math.Min(b, node.Value);
-                //        if (b <= a)
-                //            break; // Alpha cutoff
-                //    }
-                //}
+
+                if(node.Children.Length == 0)
+                {
+                    BuildTree(node, !isMax, a, b);
+                }
             }
 
             if (node.Children.Length > 0 && !node.State.IsTerminal)
