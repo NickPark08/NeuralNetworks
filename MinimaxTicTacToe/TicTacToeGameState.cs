@@ -79,7 +79,6 @@ namespace MinimaxTicTacToe
         {
             if (children != null) return children;
 
-            //isXTurn = !isXTurn; // ???
             var possibleBoards = PossibleBoard();
             children = new TicTacToeGameState[possibleBoards.Length];
             for(int i = 0; i < children.Length; i++)
