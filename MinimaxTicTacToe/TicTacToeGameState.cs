@@ -10,7 +10,7 @@ namespace MinimaxTicTacToe
 {
     public class TicTacToeGameState : IGameState<TicTacToeGameState>
     {
-        Random rand = new(1);
+        //Random rand = new(1);
         public int[,] board;
         public bool isXTurn = true; // X - Maximizer, O - Minimizer
 

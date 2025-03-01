@@ -1,14 +1,19 @@
 using NeuralNetworks;
 
+using MonteNode = NeuralNetworks.MonteCarloTree<MinimaxTicTacToe.TicTacToeGameState>.Node;
+
+
 namespace MinimaxTicTacToe
 {
     public partial class Form1 : Form
     {
         Button[,] buttons;
         bool circleTurn;
-        MiniMax<TicTacToeGameState> minimax = new MiniMax<TicTacToeGameState>();
-        MiniMax<TicTacToeGameState>.Node root;
+        //MiniMax<TicTacToeGameState> minimax = new MiniMax<TicTacToeGameState>();
+        MonteCarloTree<TicTacToeGameState> monteCarlo = new MonteCarloTree<TicTacToeGameState>();
+        MonteNode root;
         TicTacToeGameState originalState;
+        Random random = new Random(1);
         public Form1()
         {
             InitializeComponent();
@@ -19,9 +24,9 @@ namespace MinimaxTicTacToe
             circleTurn = false;
             buttons = new Button[3, 3];
             originalState = new TicTacToeGameState(buttons);
-            root = new(originalState);
-            minimax.Opossum = new TicTacToeGameState(new int[,] { { 0, 2, 1 }, { 0, 2, 1 }, { 0, 0, 1 } }, false);
-            minimax.BuildTree(root, !circleTurn);
+            //root = new(originalState);
+            //minimax.Opossum = new TicTacToeGameState(new int[,] { { 0, 2, 1 }, { 0, 2, 1 }, { 0, 0, 1 } }, false);
+            //minimax.BuildTree(root, !circleTurn);
             label1.Size = new(100, 100);
             label1.Font = new("Times New Roman", 50);
             label1.Text = "";
@@ -49,6 +54,10 @@ namespace MinimaxTicTacToe
                 y += 110;
                 x = 225;
             }
+
+            root = new MonteNode(originalState);
+            monteCarlo.root = root;
+            monteCarlo.MCTS(9, root.State, random);
         }
 
         private void OnClick(object? sender, EventArgs e)
@@ -57,7 +66,7 @@ namespace MinimaxTicTacToe
 
             if (buttons == null || button.Text != "") return;
 
-            minimax.isMax = !circleTurn;
+            //minimax.isMax = !circleTurn;
 
             if (!circleTurn)
             {
@@ -65,20 +74,20 @@ namespace MinimaxTicTacToe
                 TicTacToeGameState tempState = new TicTacToeGameState(buttons);
                 foreach (var state in root.Children)
                 {
-                    if (state.State.board.SequenceEquals(tempState.board))
+                    if (state != null && state.State.board.SequenceEquals(tempState.board))
                     {
-                        root = state;
+                        monteCarlo.root = state;
                         break;
                     }
                 }
 
                 circleTurn = !circleTurn;
             }
-            minimax.isMax = !circleTurn;
+            //minimax.isMax = !circleTurn;
 
             if (circleTurn)
             {
-                if (root.Children.Length == 0)
+                if (monteCarlo.root.Children.Length == 0)
                 {
                     label1.Text = " T\n  I\n E";
                     label2.Text = " G\n A\n M\n E";
@@ -86,15 +95,16 @@ namespace MinimaxTicTacToe
                 }
 
                 //TestDepthFirst(minimax.isMax, root);
-                var node = minimax.FindBestMove(root);
+                TicTacToeGameState test = monteCarlo.MCTS(100000, root.State, random);
+                var node = new MonteNode(test);
 
-                MiniMax<TicTacToeGameState>.Node bestMove = null;
+                MonteNode bestMove = null;
 
-                foreach (var child in root.Children)
+                foreach (var child in monteCarlo.root.Children)
                 {
                     if (child == node)
                     {
-                        bestMove = child;
+                        bestMove = node;
                         break;
                     }
                 }
@@ -145,12 +155,12 @@ namespace MinimaxTicTacToe
 
             if (node.Children.Length != 0)
             {
-        
-                    for (int i = 0; i < node.Children.Length; i++)
-                    {
-                        TestDepthFirst(!max, node.Children[i]);
-                    }
-                
+
+                for (int i = 0; i < node.Children.Length; i++)
+                {
+                    TestDepthFirst(!max, node.Children[i]);
+                }
+
             }
         }
     }

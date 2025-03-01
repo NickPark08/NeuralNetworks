@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,8 +14,8 @@ namespace NeuralNetworks
             public T State { get; set; }
             public Node Parent;
             public Node[] Children;
-            public int W;
-            public int N;
+            public double W;
+            public double N;
             public bool isExpanded;
             const double C = 1.5;
 
@@ -25,11 +26,16 @@ namespace NeuralNetworks
                 Children = new Node[state.GetChildren().Length];
                 W = 0;
                 N = 0;
+                isExpanded = false;
             }
 
             public double UCT()
             {
-                return (W / N) + C*Math.Sqrt(Math.Log(Parent.N) / N);
+                if (N != 0)
+                {
+                    return (W / N) + C * Math.Sqrt(Math.Log(Parent.N) / N);
+                }
+                return double.PositiveInfinity;
             }
 
             public void GenerateChildren()
@@ -37,7 +43,9 @@ namespace NeuralNetworks
                 for(int i = 0; i < Children.Length; i++)
                 {
                     Children[i] = new Node(State.GetChildren()[i]);
+                    Children[i].Parent = this;
                 }
+                isExpanded = true;
             }
 
             //public override string ToString()
@@ -46,9 +54,13 @@ namespace NeuralNetworks
             //}
         }
 
-        public static T MCTS(int iterations, T startingState, Random random)
+        public Node root;
+
+        public T MCTS(int iterations, T startingState, Random random)
         {
-            var root = new Node(startingState);
+            // check bugs with children being null / not expanded
+
+            root = new Node(startingState);
             for(int i = 0; i < iterations; i++)
             {
                 var selectedNode = Select(root);
@@ -98,7 +110,7 @@ namespace NeuralNetworks
 
         internal static int Simulation(Node currentNode, Random random)
         {
-            while(!currentNode.State.IsTerminal)
+            while(!currentNode.State.IsTerminal && currentNode.Children.Length != 0)
             {
                 currentNode.GenerateChildren();
                 int ranIndex = random.Next(currentNode.Children.Length);
