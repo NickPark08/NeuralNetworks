@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeuralNetworks
 {
@@ -13,17 +10,17 @@ namespace NeuralNetworks
         {
             public T State { get; set; }
             public Node Parent;
-            public Node[] Children;
+            public List<Node> Children;
             public double W;
             public double N;
             public bool isExpanded;
-            const double C = 1.5;
+            private const double C = 1.5;
 
-            public Node(T state)
+            public Node(T state, Node parent = null)
             {
                 State = state;
-                //Value = state.Value;
-                Children = new Node[state.GetChildren().Length];
+                Parent = parent;
+                Children = new List<Node>();
                 W = 0;
                 N = 0;
                 isExpanded = false;
@@ -31,37 +28,30 @@ namespace NeuralNetworks
 
             public double UCT()
             {
-                if (N != 0)
-                {
-                    return (W / N) + C * Math.Sqrt(Math.Log(Parent.N) / N);
-                }
-                return double.PositiveInfinity;
+                if (N == 0) return double.PositiveInfinity;
+                return (W / N) + C * Math.Sqrt(Math.Log(Parent.N) / N);
             }
 
             public void GenerateChildren()
             {
-                for(int i = 0; i < Children.Length; i++)
+                if (isExpanded) return;
+
+                var childStates = State.GetChildren();
+                foreach (var childState in childStates)
                 {
-                    Children[i] = new Node(State.GetChildren()[i]);
-                    Children[i].Parent = this;
+                    Children.Add(new Node(childState, this));
                 }
                 isExpanded = true;
             }
-
-            //public override string ToString()
-            //{
-            //    return Value.ToString() + "\n" + State.ToString();
-            //}
         }
 
         public Node root;
 
         public T MCTS(int iterations, T startingState, Random random)
         {
-            // check bugs with children being null / not expanded
-
             root = new Node(startingState);
-            for(int i = 0; i < iterations; i++)
+
+            for (int i = 0; i < iterations; i++)
             {
                 var selectedNode = Select(root);
                 var expandedNode = Expansion(selectedNode);
@@ -69,65 +59,51 @@ namespace NeuralNetworks
                 Backprop(value, expandedNode);
             }
 
-            var sortedNodes = root.Children.OrderByDescending(x => x.W);
-            return sortedNodes.First().State;
+            return root.Children.OrderByDescending(x => x.N).First().State;
         }
 
-
-        internal static Node Select(Node rootNode)
+        private static Node Select(Node rootNode)
         {
             Node currentNode = rootNode;
-
-            while(currentNode.isExpanded)
+            while (currentNode.isExpanded && currentNode.Children.Count > 0)
             {
-                Node highestChild = null;
-                double highestUCT = double.NegativeInfinity;
-                foreach(var child in currentNode.Children)
-                {
-                    double val = child.UCT();
-                    if (val < highestUCT)
-                    {
-                        highestUCT = val;
-                        highestChild = child;
-                    }
-                }
-                if (highestChild == null) break;
-
-                currentNode = highestChild;
+                currentNode = currentNode.Children.OrderByDescending(child => child.UCT()).First();
             }
-
             return currentNode;
         }
 
-        internal static Node Expansion(Node currentNode)
+        private static Node Expansion(Node currentNode)
         {
-            currentNode.GenerateChildren();
-
-            if (currentNode.Children.Length == 0) return currentNode;
-
-            return currentNode.Children[0];
-        }
-
-        internal static int Simulation(Node currentNode, Random random)
-        {
-            while(!currentNode.State.IsTerminal && currentNode.Children.Length != 0)
+            if (!currentNode.State.IsTerminal)
             {
                 currentNode.GenerateChildren();
-                int ranIndex = random.Next(currentNode.Children.Length);
-                currentNode = currentNode.Children[ranIndex];
+                if (currentNode.Children.Count > 0)
+                {
+                    return currentNode.Children[new Random().Next(currentNode.Children.Count)];
+                }
             }
-
-            return currentNode.State.Value;
+            return currentNode;
         }
 
-        internal static void Backprop(int value, Node simulatedNode)
+        private static int Simulation(Node currentNode, Random random)
+        {
+            T state = currentNode.State;
+            while (!state.IsTerminal)
+            {
+                var children = state.GetChildren();
+                if (children.Length == 0) break;
+                state = children[random.Next(children.Length)];
+            }
+            return state.Value;
+        }
+
+        private static void Backprop(int value, Node simulatedNode)
         {
             Node currentNode = simulatedNode;
-
-            while(currentNode != null)
+            while (currentNode != null)
             {
                 currentNode.N++;
-                currentNode.W += -value;
+                currentNode.W += value;
                 currentNode = currentNode.Parent;
             }
         }

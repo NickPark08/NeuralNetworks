@@ -87,7 +87,7 @@ namespace MinimaxTicTacToe
 
             if (circleTurn)
             {
-                if (monteCarlo.root.Children.Length == 0)
+                if (monteCarlo.root.Children.Count == 0)
                 {
                     label1.Text = " T\n  I\n E";
                     label2.Text = " G\n A\n M\n E";
@@ -95,7 +95,7 @@ namespace MinimaxTicTacToe
                 }
 
                 //TestDepthFirst(minimax.isMax, root);
-                TicTacToeGameState test = monteCarlo.MCTS(100000, root.State, random);
+                TicTacToeGameState test = monteCarlo.MCTS(1000, root.State, random);
                 var node = new MonteNode(test);
 
                 MonteNode bestMove = null;
@@ -112,6 +112,7 @@ namespace MinimaxTicTacToe
                 if (bestMove != null)
                 {
                     root = bestMove;
+                    monteCarlo.root = bestMove;
                     DisplayBoard(root.State.board);
                 }
                 circleTurn = !circleTurn;
