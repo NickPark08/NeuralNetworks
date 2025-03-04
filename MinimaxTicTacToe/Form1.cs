@@ -57,7 +57,6 @@ namespace MinimaxTicTacToe
 
             root = new MonteNode(originalState);
             monteCarlo.root = root;
-            monteCarlo.MCTS(9, root.State, random);
         }
 
         private void OnClick(object? sender, EventArgs e)
@@ -70,9 +69,10 @@ namespace MinimaxTicTacToe
 
             if (!circleTurn)
             {
+                monteCarlo.MCTS(100, monteCarlo.root.State, random);
                 button.Text = "X";
                 TicTacToeGameState tempState = new TicTacToeGameState(buttons);
-                foreach (var state in root.Children)
+                foreach (var state in monteCarlo.root.Children)
                 {
                     if (state != null && state.State.board.SequenceEquals(tempState.board))
                     {
@@ -95,14 +95,14 @@ namespace MinimaxTicTacToe
                 }
 
                 //TestDepthFirst(minimax.isMax, root);
-                TicTacToeGameState test = monteCarlo.MCTS(1000, root.State, random);
+                TicTacToeGameState test = monteCarlo.MCTS(1000, monteCarlo.root.State, random);
                 var node = new MonteNode(test);
 
                 MonteNode bestMove = null;
 
-                foreach (var child in monteCarlo.root.Children)
+                foreach (var child in monteCarlo.root.State.GetChildren())
                 {
-                    if (child == node)
+                    if (child == node.State)
                     {
                         bestMove = node;
                         break;
@@ -113,12 +113,12 @@ namespace MinimaxTicTacToe
                 {
                     root = bestMove;
                     monteCarlo.root = bestMove;
-                    DisplayBoard(root.State.board);
+                    DisplayBoard(monteCarlo.root.State.board);
                 }
                 circleTurn = !circleTurn;
             }
 
-            if (root.State.IsTerminal)
+            if (monteCarlo.root.State.IsTerminal)
             {
                 buttons = null;
                 string winner = !circleTurn ? "OS" : "XS";

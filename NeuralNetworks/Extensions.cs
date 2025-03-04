@@ -22,5 +22,16 @@ namespace NeuralNetworks
             return true;
         }
 
+        public static bool TwoDContains(this int[,] arr1, int num)
+        {
+            for (int i = 0; i < arr1.GetLength(1); i++)
+            {
+                for (int j = 0; j < arr1.GetLength(0); j++)
+                {
+                    if (arr1[i, j] == num) return true;
+                }
+            }
+            return false;
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace MinimaxTicTacToe
 
         public int Value => GetValue()/* * 1000 + rand.Next(10)*/;
 
-        public bool IsTerminal => GetValue() != 0;
+        public bool IsTerminal => GetValue() != 0 || !board.TwoDContains(0);
 
         TicTacToeGameState[] children = null;
 
@@ -124,7 +124,6 @@ namespace MinimaxTicTacToe
 
         public bool Equivalent(object other)
         {
-
             return board.SequenceEquals(((TicTacToeGameState)other).board);
         }
     }
