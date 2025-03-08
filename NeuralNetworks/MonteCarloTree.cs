@@ -14,6 +14,7 @@ namespace NeuralNetworks
             public double W;
             public double N;
             public bool isExpanded;
+            public bool xTurn;
             private const double C = 1.5;
 
             public Node(T state, Node parent = null)
@@ -54,17 +55,28 @@ namespace NeuralNetworks
 
         public T MCTS(int iterations, T startingState, Random random)
         {
+
+            //make sure root.xTurn is correct
             root = new Node(startingState);
 
             for (int i = 0; i < iterations; i++)
             {
                 var selectedNode = Select(root);
                 var expandedNode = Expansion(selectedNode);
-                int value = Simulation(expandedNode, random);
-                Backprop(value, expandedNode);
+                var testNode = Simulation(expandedNode, random);
+                //int value = Simulation(expandedNode, random);
+                Backprop(testNode.State.Value, testNode);
             }
 
-            return root.Children.OrderByDescending(x => (x.W / x.N)).First().State;
+            if (root.xTurn)
+            {
+                return root.Children.OrderByDescending(x => (x.W / x.N)).Last().State;
+            }
+            else
+            {
+                return root.Children.OrderByDescending(x => (x.W / x.N)).First().State;
+            }
+
         }
 
         private static Node Select(Node rootNode)
@@ -99,7 +111,7 @@ namespace NeuralNetworks
             return currentNode;
         }
 
-        private static int Simulation(Node currentNode, Random random)
+        private static Node Simulation(Node currentNode, Random random)
         {
 
             while (!currentNode.State.IsTerminal)
@@ -109,11 +121,11 @@ namespace NeuralNetworks
                 {
                     ;
                 }
-                int randomIndex = random.Next(0, currentNode.Children.Count);
-                currentNode = currentNode.Children[randomIndex];
+                currentNode = currentNode.Children[random.Next(0, currentNode.Children.Count)];
             }
 
-            return currentNode.State.Value;
+            return currentNode;
+            //return currentNode.State.Value;
         }
 
         private static void Backprop(int value, Node simulatedNode)
@@ -121,9 +133,8 @@ namespace NeuralNetworks
             Node currentNode = simulatedNode;
             while (currentNode != null)
             {
-                value = -value;
                 currentNode.N++;
-                currentNode.W += value;
+                currentNode.W += -value;
                 currentNode = currentNode.Parent;
             }
         }
