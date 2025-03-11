@@ -55,20 +55,20 @@ namespace MinimaxTicTacToe
                 x = 225;
             }
 
-            root = new MonteNode(originalState);
+            root = new MonteNode(originalState, !circleTurn);
             monteCarlo.root = root;
 
-            monteCarlo.root.State.board = new int[3, 3];
-            monteCarlo.root.State.board[0, 1] = 1;
-            monteCarlo.root.State.board[0, 0] = 2;
-            monteCarlo.root.State.board[0, 2] = 1;
-            monteCarlo.root.State.board[1, 1] = 0;
-            monteCarlo.root.State.board[1, 0] = 1;
+            //monteCarlo.root.State.board = new int[3, 3];
+            //monteCarlo.root.State.board[0, 1] = 1;
+            //monteCarlo.root.State.board[0, 0] = 2;
+            //monteCarlo.root.State.board[0, 2] = 1;
+            //monteCarlo.root.State.board[1, 1] = 0;
+            //monteCarlo.root.State.board[1, 0] = 1;
             monteCarlo.root.State.isXTurn = !circleTurn;
-            monteCarlo.root.xTurn = !circleTurn;
+            //monteCarlo.root.xTurn = !circleTurn;
 
             DisplayBoard(monteCarlo.root.State.board);
-            //monteCarlo.MCTS(100, monteCarlo.root.State, random);
+            //monteCarlo.MCTS(1000, monteCarlo.root.State, random);
         }
 
         private void OnClick(object? sender, EventArgs e)
@@ -77,10 +77,12 @@ namespace MinimaxTicTacToe
 
             if (buttons == null || button.Text != "") return;
 
-            //minimax.isMax = !circleTurn;
+
 
             //button.Text = "X";
             //TicTacToeGameState tempState = new TicTacToeGameState(buttons);
+            //monteCarlo.MCTS(9, monteCarlo.root.State, random);
+
             //foreach (var state in monteCarlo.root.Children)
             //{
             //    if (state != null && state.State.board.SequenceEquals(tempState.board))
@@ -90,11 +92,38 @@ namespace MinimaxTicTacToe
             //    }
             //}
 
+
+            //minimax.isMax = !circleTurn;
+
+            var test = monteCarlo.MCTS(1000, monteCarlo.root.State, random);
+            //circleTurn = !circleTurn;
+            //monteCarlo.root.xTurn = !circleTurn;
+            var testNode = new MonteNode(test, test.isXTurn);
+            foreach (var child in monteCarlo.root.State.GetChildren())
+            {
+                if (child == testNode.State)
+                {
+                    monteCarlo.root = testNode;
+                    break;
+                }
+            }
+
+            DisplayBoard(monteCarlo.root.State.board);
+
+            if (monteCarlo.root.State.IsTerminal)
+            {
+                buttons = null;
+                string winner = circleTurn ? "OS" : "XS";
+                label1.Text = winner;
+                label2.Text = " W\n  I\n N";
+            }
+
+
             //circleTurn = !circleTurn;
 
-            ////minimax.isMax = !circleTurn;
-           
-            // O-player
+            //minimax.isMax = !circleTurn;
+
+            //O - player
 
             //if (monteCarlo.root.Children.Count == 0)
             //{
@@ -103,7 +132,7 @@ namespace MinimaxTicTacToe
             //    return;
             //}
 
-            ////TestDepthFirst(minimax.isMax, root);
+            //TestDepthFirst(minimax.isMax, root);
             //TicTacToeGameState test = monteCarlo.MCTS(10000, monteCarlo.root.State, random);
             //var node = new MonteNode(test);
 
@@ -124,30 +153,9 @@ namespace MinimaxTicTacToe
             //    monteCarlo.root = bestMove;
             //    DisplayBoard(monteCarlo.root.State.board);
             //}
-            //circleTurn = !circleTurn;
 
 
-            var test = monteCarlo.MCTS(100, monteCarlo.root.State, random);
-            var testNode = new MonteNode(test);
-            foreach (var child in monteCarlo.root.State.GetChildren())
-            {
-                if (child == testNode.State)
-                {
-                    monteCarlo.root = testNode;
-                    break;
-                }
-            }
-
-            DisplayBoard(monteCarlo.root.State.board);
-
-            if (monteCarlo.root.State.IsTerminal)
-            {
-                buttons = null;
-                string winner = circleTurn ? "OS" : "XS";
-                label1.Text = winner;
-                label2.Text = " W\n  I\n N";
-            }
-            monteCarlo.root.xTurn = !monteCarlo.root.xTurn;
+            //monteCarlo.root.xTurn = !monteCarlo.root.xTurn;
         }
 
         private void DisplayBoard(int[,] board)

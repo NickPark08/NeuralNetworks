@@ -17,7 +17,7 @@ namespace NeuralNetworks
             public bool xTurn;
             private const double C = 1.5;
 
-            public Node(T state, Node parent = null)
+            public Node(T state, bool isXTurn, Node parent = null)
             {
                 State = state;
                 Parent = parent;
@@ -25,6 +25,7 @@ namespace NeuralNetworks
                 W = 0;
                 N = 0;
                 isExpanded = false;
+                xTurn = isXTurn;
             }
 
             public double UCT()
@@ -40,7 +41,7 @@ namespace NeuralNetworks
                 var childStates = State.GetChildren();
                 foreach (var childState in childStates)
                 {
-                    Children.Add(new Node(childState, this));
+                    Children.Add(new Node(childState, !xTurn, this));
                 }
                 isExpanded = true;
             }
@@ -57,7 +58,7 @@ namespace NeuralNetworks
         {
 
             //make sure root.xTurn is correct
-            root = new Node(startingState);
+            root = new Node(startingState, root.xTurn);
 
             for (int i = 0; i < iterations; i++)
             {
@@ -65,17 +66,22 @@ namespace NeuralNetworks
                 var expandedNode = Expansion(selectedNode);
                 var testNode = Simulation(expandedNode, random);
                 //int value = Simulation(expandedNode, random);
-                Backprop(testNode.State.Value, testNode);
+                Backprop(Math.Abs(testNode.State.Value), testNode);
             }
 
-            if (root.xTurn)
-            {
-                return root.Children.OrderByDescending(x => (x.W / x.N)).Last().State;
-            }
-            else
-            {
-                return root.Children.OrderByDescending(x => (x.W / x.N)).First().State;
-            }
+
+            var orderedKids = root.Children.OrderByDescending(x => x.W);
+            //if (root.xTurn)
+            //{
+            //    return orderedKids.Last().State;
+            //}
+            //else
+            //{
+                return orderedKids.First().State;
+            //}
+
+
+            // check os always win when should be tie
 
         }
 
@@ -134,8 +140,9 @@ namespace NeuralNetworks
             while (currentNode != null)
             {
                 currentNode.N++;
-                currentNode.W += -value;
+                currentNode.W += value;
                 currentNode = currentNode.Parent;
+                value = -value;
             }
         }
     }
