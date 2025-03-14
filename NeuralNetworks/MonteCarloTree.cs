@@ -77,7 +77,7 @@ namespace NeuralNetworks
             //}
             //else
             //{
-                return orderedKids.First().State;
+            return orderedKids.First().State;
             //}
 
 
@@ -109,12 +109,20 @@ namespace NeuralNetworks
 
         private static Node Expansion(Node currentNode)
         {
-            if (!currentNode.State.IsTerminal)
-            {
-                currentNode.GenerateChildren();
-                if (currentNode.Children.Count != 0) return currentNode.Children[0];
-            }
-            return currentNode;
+
+            if (currentNode.State.IsTerminal) return currentNode;
+
+            currentNode.GenerateChildren();
+
+            return currentNode.Children.Count > 0 ? currentNode.Children[0] : currentNode;
+
+
+            //if (!currentNode.State.IsTerminal)
+            //{
+            //    currentNode.GenerateChildren();
+            //    if (currentNode.Children.Count != 0) return currentNode.Children[0];
+            //}
+            //return currentNode;
         }
 
         private static Node Simulation(Node currentNode, Random random)
@@ -123,7 +131,7 @@ namespace NeuralNetworks
             while (!currentNode.State.IsTerminal)
             {
                 currentNode.GenerateChildren();
-                if(currentNode.Children.Count == 0)
+                if (currentNode.Children.Count == 0)
                 {
                     ;
                 }
