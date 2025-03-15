@@ -59,12 +59,12 @@ namespace MinimaxTicTacToe
             monteCarlo.root = root;
 
             //monteCarlo.root.State.board = new int[3, 3];
-            //monteCarlo.root.State.board[0, 1] = 1;
-            //monteCarlo.root.State.board[0, 0] = 2;
+            //monteCarlo.root.State.board[0, 1] = 2;
+            //monteCarlo.root.State.board[0, 0] = 1;
             //monteCarlo.root.State.board[0, 2] = 1;
-            //monteCarlo.root.State.board[1, 1] = 0;
+            //monteCarlo.root.State.board[1, 1] = 1;
             //monteCarlo.root.State.board[1, 0] = 1;
-            monteCarlo.root.State.isXTurn = !circleTurn;
+            //monteCarlo.root.State.isXTurn = !circleTurn;
             //monteCarlo.root.xTurn = !circleTurn;
 
             DisplayBoard(monteCarlo.root.State.board);
@@ -79,18 +79,18 @@ namespace MinimaxTicTacToe
 
 
 
-            //button.Text = "X";
-            //TicTacToeGameState tempState = new TicTacToeGameState(buttons);
-            //monteCarlo.MCTS(9, monteCarlo.root.State, random);
+            button.Text = "X";
+            TicTacToeGameState tempState = new TicTacToeGameState(buttons);
+            monteCarlo.MCTS(9, monteCarlo.root.State, random);
 
-            //foreach (var state in monteCarlo.root.Children)
-            //{
-            //    if (state != null && state.State.board.SequenceEquals(tempState.board))
-            //    {
-            //        monteCarlo.root = state;
-            //        break;
-            //    }
-            //}
+            foreach (var state in monteCarlo.root.Children)
+            {
+                if (state != null && state.State.board.SequenceEquals(tempState.board))
+                {
+                    monteCarlo.root = state;
+                    break;
+                }
+            }
 
 
             //minimax.isMax = !circleTurn;

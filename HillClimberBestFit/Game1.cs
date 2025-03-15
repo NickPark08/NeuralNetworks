@@ -73,11 +73,11 @@ namespace HillClimberBestFit
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).board.Back == boardtate.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             MouseState ms = Mouse.GetState();
-            if (ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released && IsActive)
+            if (ms.LeftButton == boardtate.Pressed && previousMs.LeftButton == boardtate.Released && IsActive)
             {
                 pointX.Add([ms.X]);
                 pointY.Add(ms.Y);

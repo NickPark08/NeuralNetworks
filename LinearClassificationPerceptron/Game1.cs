@@ -87,12 +87,12 @@ namespace PerceptronLinearClassification
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).board.Back == boardtate.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             MouseState ms = Mouse.GetState();
             KeyboardState ks = Keyboard.GetState();
-            if (ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released && IsActive)
+            if (ms.LeftButton == boardtate.Pressed && previousMs.LeftButton == boardtate.Released && IsActive)
             {
                 points.Add(new ClassifiedPoint(ms.X, ms.Y, 0));
                 inputs.Add([ms.X, ms.Y]);
@@ -100,7 +100,7 @@ namespace PerceptronLinearClassification
                 currentError = double.MaxValue;
             }
 
-            if (ms.RightButton == ButtonState.Pressed && previousMs.RightButton == ButtonState.Released && IsActive)
+            if (ms.RightButton == boardtate.Pressed && previousMs.RightButton == boardtate.Released && IsActive)
             {
                 points.Add(new ClassifiedPoint(ms.X, ms.Y, 1));
                 inputs.Add([ms.X, ms.Y]);

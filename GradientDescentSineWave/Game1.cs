@@ -61,7 +61,7 @@ namespace GradientDescentSineWave
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).board.Back == boardtate.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
             Console.WriteLine(network.BatchTrain(inputs, outputs, 5, .01, .01));

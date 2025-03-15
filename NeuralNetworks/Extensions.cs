@@ -22,7 +22,7 @@ namespace NeuralNetworks
             return true;
         }
 
-        public static bool TwoDContains(this int[,] arr1, int num)
+        public static bool TwoDContains (this int[,] arr1, int num)
         {
             for (int i = 0; i < arr1.GetLength(1); i++)
             {

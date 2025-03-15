@@ -2,34 +2,54 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+using NeuralNetworks;
+using MonoGame.Extended;
+
+using System;
+
 namespace MCTSCheckers;
 
 public class Game1 : Game
 {
-    private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
+    private GraphicsDeviceManager graphics;
+    private SpriteBatch spriteBatch;
 
+    Rectangle[,] board;
 
-    //enum (red, black, nothing, king)
-    //ClientSize = new Size(2 * startX + squareSize * buttons.GetLength(0) + squareGap * (buttons.GetLength(0) - 1), 2 * startY + squareSize * buttons.GetLength(0) + squareGap * (buttons.GetLength(0) - 1));
+    const int squareSize = 100;
 
     public Game1()
     {
-        _graphics = new GraphicsDeviceManager(this);
+        graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+
     }
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
+        board = new Rectangle[8, 8];
+        Size ClientSize = new Size(squareSize * board.GetLength(0),squareSize * board.GetLength(0));
+
+        graphics.PreferredBackBufferWidth = ClientSize.Width;
+        graphics.PreferredBackBufferHeight = ClientSize.Height;
+        graphics.ApplyChanges();
+
+        for (int i = 0; i < board.GetLength(0); i++)
+        {
+            for (int j = 0; j < board.GetLength(1); j++)
+            {
+                board[i, j] = new Rectangle(squareSize * i, squareSize * j, squareSize, squareSize);
+            }
+        }
+
 
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
+        spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // TODO: use this.Content to load your game content here
     }
@@ -48,7 +68,27 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // TODO: Add your drawing code here
+        spriteBatch.Begin();
+
+        for (int i = 0; i < board.GetLength(0); i++)
+        {
+            for (int j = 0; j < board.GetLength(1) - 1; j+= 2)
+            {
+                if (i % 2 == 0)
+                {
+                    spriteBatch.FillRectangle(board[i, j], Color.LightGray);
+                    spriteBatch.FillRectangle(board[i, j + 1], Color.DarkGray);
+                }
+                else if (i % 2 == 1)
+                {
+                    spriteBatch.FillRectangle(board[i, j], Color.DarkGray);
+                    spriteBatch.FillRectangle(board[i, j + 1], Color.LightGray);
+
+                }
+            }
+        }
+
+        spriteBatch.End();
 
         base.Draw(gameTime);
     }

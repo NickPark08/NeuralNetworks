@@ -70,7 +70,7 @@ namespace NeuralNetworks
             }
 
 
-            var orderedKids = root.Children.OrderByDescending(x => x.W);
+            var orderedKids = root.Children.OrderByDescending(x => x.W / x.N);
             //if (root.xTurn)
             //{
             //    return orderedKids.Last().State;
