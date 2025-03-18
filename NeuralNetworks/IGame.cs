@@ -12,6 +12,5 @@ namespace NeuralNetworks
         int Value { get; }
         bool IsTerminal { get; }
         T[] GetChildren();
-        bool Equivalent(object other);
     }
 }

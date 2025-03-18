@@ -24,15 +24,20 @@ namespace MCTSCheckers
             BlackKing = Black | King,
         }
 
-        public Piece [,] board;
+        public Piece[,] board;
         int redCount;
         int redKingCount;
         int blackCount;
         int blackKingCount;
+        bool redTurn;
+        List<CheckersGameState> children;
 
-        public CheckersGameState(Piece[,] b)
+
+        public CheckersGameState(Piece[,] b, bool turn)
         {
+            redTurn = turn;
             board = b;
+            children = new List<CheckersGameState>();
 
             for (int i = 0; i < board.GetLength(0); i++)
             {
@@ -58,7 +63,20 @@ namespace MCTSCheckers
             }
         }
 
-
+        public override string ToString()
+        {
+            string result = "\n";
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    var curr = board[j, i];
+                    result += (" " + (curr == Piece.Red ? 'R' : curr == Piece.Black ? 'B' : '_'));
+                }
+                result += "\n";
+            }
+            return result;
+        }
 
 
 
@@ -66,15 +84,88 @@ namespace MCTSCheckers
 
         public bool IsTerminal => blackCount == 0 || redCount == 0; //game over, no pieces
 
-        public bool Equivalent(object other)
+        public override bool Equals(object obj)
         {
-            throw new NotImplementedException();
+            return base.Equals(obj); // 2d equals
         }
 
         public CheckersGameState[] GetChildren()
         {
-            throw new NotImplementedException();
+            var possibleBoards = PossibleBoards();
+
+            for (int i = 0; i < possibleBoards.Length; i++)
+            {
+                children.Add(new(possibleBoards[i], !redTurn));
+            }
+
+            return children.ToArray();
         }
+
+        private Piece[][,] PossibleBoards()
+        {
+            // change for loops +- 1, no moves?
+            List<Piece[,]> possibleBoards = [];
+            var player = redTurn ? Piece.Red : Piece.Black;
+            for (int i = 1; i < board.GetLength(1) - 1; i++)
+            {
+                for (int j = 1; j < board.GetLength(0) - 1; j++)
+                {
+                    if (board[j, i] != player) continue;
+
+                    if (player != Piece.Red)
+                    {
+                        if (board[j + 1, i + 1] == Piece.None)
+                        {
+                            var tempBoard = (Piece[,])board.Clone();
+                            tempBoard[j + 1, i + 1] = Piece.Red;
+                            tempBoard[j, i]  = Piece.None;
+                            possibleBoards.Add(tempBoard);
+                        }
+                        if (board[j - 1, i + 1] == Piece.None)
+                        {
+                            var tempBoard = (Piece[,])board.Clone();
+                            tempBoard[j - 1, i + 1] = Piece.Red;
+                            tempBoard[j, i] = Piece.None;
+                            possibleBoards.Add(tempBoard);
+                        }
+                    }
+                    else
+                    {
+                        if (board[j + 1, i - 1] == Piece.None)
+                        {
+                            var tempBoard = (Piece[,])board.Clone();
+                            tempBoard[j + 1, i - 1] = Piece.Black;
+                            tempBoard[j, i] = Piece.None;
+                            possibleBoards.Add(tempBoard);
+                        }
+                        if (board[j - 1, i - 1] == Piece.None)
+                        {
+                            var tempBoard = (Piece[,])board.Clone();
+                            tempBoard[j - 1, i - 1] = Piece.Black;
+                            tempBoard[j, i] = Piece.None;
+                            possibleBoards.Add(tempBoard);
+                        }
+                    }
+
+                }
+            }
+            return possibleBoards.ToArray();
+        }
+
+        //private bool HasForcedMove()
+        //{
+        //    for(int i = 0; i < board.GetLength(0); i++)
+        //    {
+        //        for(int j = 0; j < board.GetLength(1); j++)
+        //        {
+        //            if (board[i, j] == Piece.Black)
+        //            {
+
+        //            }
+        //        }
+        //    }
+        //}
+
+
     }
 }
- 
