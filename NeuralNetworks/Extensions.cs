@@ -10,13 +10,13 @@ namespace NeuralNetworks
     {
         public static int Add(this int a, int b) => a + b;
 
-        public static bool SequenceEquals(this int[,] arr1, int[,] arr2)
+        public static bool SequenceEquals<T>(this T[,] arr1, T[,] arr2)
         {
             for(int i = 0; i < arr1.GetLength(1); i++)
             {
                 for(int j = 0; j < arr1.GetLength(0); j++)
                 {
-                    if (arr1[i, j] != arr2[i, j]) return false;
+                    if (!arr1[i, j].Equals(arr2[i, j])) return false;
                 }
             }
             return true;

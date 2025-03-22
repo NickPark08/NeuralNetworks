@@ -29,7 +29,7 @@ namespace MCTSCheckers
         int redKingCount;
         int blackCount;
         int blackKingCount;
-        bool redTurn;
+        public bool redTurn;
         List<CheckersGameState> children;
 
 
@@ -106,47 +106,34 @@ namespace MCTSCheckers
             // change for loops +- 1, no moves?
             List<Piece[,]> possibleBoards = [];
             var player = redTurn ? Piece.Red : Piece.Black;
-            for (int i = 1; i < board.GetLength(1) - 1; i++)
+            for (int i = 0; i < board.GetLength(1); i++)
             {
-                for (int j = 1; j < board.GetLength(0) - 1; j++)
+                for (int j = 0; j < board.GetLength(0); j++)
                 {
                     if (board[j, i] != player) continue;
 
-                    if (player != Piece.Red)
+                    int y = redTurn ? i + 1 : i - 1;
+
+                    if(j == board.GetLength(0) - 1)
                     {
-                        if (board[j + 1, i + 1] == Piece.None)
-                        {
-                            var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[j + 1, i + 1] = Piece.Red;
-                            tempBoard[j, i]  = Piece.None;
-                            possibleBoards.Add(tempBoard);
-                        }
-                        if (board[j - 1, i + 1] == Piece.None)
-                        {
-                            var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[j - 1, i + 1] = Piece.Red;
-                            tempBoard[j, i] = Piece.None;
-                            possibleBoards.Add(tempBoard);
-                        }
-                    }
-                    else
-                    {
-                        if (board[j + 1, i - 1] == Piece.None)
-                        {
-                            var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[j + 1, i - 1] = Piece.Black;
-                            tempBoard[j, i] = Piece.None;
-                            possibleBoards.Add(tempBoard);
-                        }
-                        if (board[j - 1, i - 1] == Piece.None)
-                        {
-                            var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[j - 1, i - 1] = Piece.Black;
-                            tempBoard[j, i] = Piece.None;
-                            possibleBoards.Add(tempBoard);
-                        }
+                        ;
                     }
 
+                    
+                    if(j + 1 <= board.GetLength(0) - 1 && board[j + 1, y] == Piece.None)
+                    {
+                        var tempBoard = (Piece[,])board.Clone();
+                        tempBoard[j + 1, y] = player;
+                        tempBoard[j, i] = Piece.None;
+                        possibleBoards.Add(tempBoard);
+                    }
+                    if (j - 1 >= 0 && board[j - 1, y] == Piece.None)
+                    {
+                        var tempBoard = (Piece[,])board.Clone();
+                        tempBoard[j - 1, y] = player;
+                        tempBoard[j, i] = Piece.None;
+                        possibleBoards.Add(tempBoard);
+                    }
                 }
             }
             return possibleBoards.ToArray();
