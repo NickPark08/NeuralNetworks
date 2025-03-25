@@ -118,6 +118,7 @@ public class Game1 : Game
                 {
                     if (board[pair[0], pair[1]].Contains(ms.X, ms.Y) && ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released)
                     {
+                        originalBoard = tree.root.State.board;
                         originalBoard[pair[0], pair[1]] = Piece.Black;
                         originalBoard[pair[2], pair[3]] = Piece.None;
                         //CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn);
@@ -149,6 +150,7 @@ public class Game1 : Game
                     break;
                 }
             }
+            redTurn = !redTurn;
         }
 
             previousMs = ms;
