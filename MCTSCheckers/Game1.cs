@@ -56,11 +56,11 @@ public class Game1 : Game
                 {
                     if (j < 3)
                     {
-                        originalBoard[i, j] = Piece.Red;
+                        originalBoard[i, j] = Piece.RedPiece;
                     }
                     else if (j > 4)
                     {
-                        originalBoard[i, j] = Piece.Black;
+                        originalBoard[i, j] = Piece.BlackPiece;
                     }
                     else
                     {
@@ -119,7 +119,7 @@ public class Game1 : Game
                     if (board[pair[0], pair[1]].Contains(ms.X, ms.Y) && ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released)
                     {
                         originalBoard = tree.root.State.board;
-                        originalBoard[pair[0], pair[1]] = Piece.Black;
+                        originalBoard[pair[0], pair[1]] = Piece.BlackPiece;
                         originalBoard[pair[2], pair[3]] = Piece.None;
                         //CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn);
                         tree.root.GenerateChildren();
@@ -172,11 +172,11 @@ public class Game1 : Game
                 {
                     spriteBatch.FillRectangle(board[i, j], Color.DarkGray);
 
-                    if (tree.root.State.board[i, j] == Piece.Red)
+                    if (tree.root.State.board[i, j] == Piece.RedPiece)
                     {
                         spriteBatch.DrawCircle(new(new Vector2(board[i, j].X + squareSize / 2, board[i, j].Y + squareSize / 2), 25), 30, Color.Red, 25);
                     }
-                    else if (tree.root.State.board[i, j] == Piece.Black)
+                    else if (tree.root.State.board[i, j] == Piece.BlackPiece)
                     {
                         spriteBatch.DrawCircle(new(new Vector2(board[i, j].X + squareSize / 2, board[i, j].Y + squareSize / 2), 25), 30, Color.Black, 25);
                     }
