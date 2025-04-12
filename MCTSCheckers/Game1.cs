@@ -105,7 +105,7 @@ public class Game1 : Game
             {
                 for (int x = 0; x < board.GetLength(1); x++)
                 {
-                    if (board[x, y].Contains(ms.X, ms.Y) && ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released && tree.root.State.board[x, y] != Piece.None)
+                    if (board[x, y].Contains(ms.X, ms.Y) && ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released && tree.root.State.board[x, y] != Piece.None && !originalBoard[x,y].HasFlag(Piece.Red))
                     {
                         currentPossibleMoves = PossibleMoves(x, y);
                     }

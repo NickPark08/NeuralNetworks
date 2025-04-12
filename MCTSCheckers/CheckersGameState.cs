@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MCTSCheckers
 {
-    class CheckersGameState : IGameState<CheckersGameState>
+    public class CheckersGameState : IGameState<CheckersGameState>
     {
         [Flags]//enum (red, black, nothing, king)
         public enum Piece
@@ -21,8 +21,8 @@ namespace MCTSCheckers
 
             //  111 = 011 | 100
 
-            RedPiece = Red | Exists,
-            BlackPiece = Exists, 
+            RedPiece = Red | Exists | MoveDown,
+            BlackPiece = Exists | MoveUp, 
             King = MoveUp | MoveDown,
 
             RedKing = RedPiece | King,
@@ -92,10 +92,10 @@ namespace MCTSCheckers
 
         public bool IsTerminal => blackCount == 0 || redCount == 0 || GetChildren().Length == 0; //game over, no pieces
 
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj); // 2d equals
-        }
+        //public override bool Equals(object obj)
+        //{
+        //    return base.Equals(obj); // 2d equals
+        //}
 
         public CheckersGameState[] GetChildren()
         {
@@ -161,56 +161,63 @@ namespace MCTSCheckers
         }
 
         private bool HasForcedMove(ref List<Piece[,]> possibleBoards)
-        {
+        { 
+
             for (int i = 0; i < board.GetLength(0); i++)
             {
                 for (int j = 0; j < board.GetLength(1); j++)
                 {
-                    if (board[j, i].HasFlag(Piece.None)) continue;
+                    if (board[j, i] == Piece.None) continue;
 
                     var player = board[j, i];
 
-                    if(j == 4 && i == 5)
+                    var enemy = player.HasFlag(Piece.Red) ? Piece.BlackPiece : Piece.RedPiece;
+
+                    if(j == 2 && i == 3)
                     {
                         ;
                     }
 
-                    if (player.HasFlag(Piece.MoveDown))
+                    if (j + 2 < board.GetLength(0) && j - 2 >= 0 && i + 2 < board.GetLength(1) && i - 2 >= 0)
                     {
-                        if (j + 2 <= board.GetLength(0) - 1 && !board[j + 1, i + 1].HasFlag(player) && board[j + 2, i + 2].HasFlag(Piece.None))
+
+                        if (player.HasFlag(Piece.MoveDown))
                         {
-                            var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[j + 2, i + 2] = player;
-                            tempBoard[j + 1, i + 1] = Piece.None;
-                            tempBoard[j, i] = Piece.None;
-                            possibleBoards.Add(tempBoard);
+                            if (board[j + 1, i + 1].HasFlag(enemy) && board[j + 2, i + 2].HasFlag(Piece.None))
+                            {
+                                var tempBoard = (Piece[,])board.Clone();
+                                tempBoard[j + 2, i + 2] = player;
+                                tempBoard[j + 1, i + 1] = Piece.None;
+                                tempBoard[j, i] = Piece.None;
+                                possibleBoards.Add(tempBoard);
+                            }
+                            if (board[j - 1, i + 1].HasFlag(enemy) && board[j - 2, i + 2].HasFlag(Piece.None))
+                            {
+                                var tempBoard = (Piece[,])board.Clone();
+                                tempBoard[j - 2, i + 2] = player;
+                                tempBoard[j - 1, i + 1] = Piece.None;
+                                tempBoard[j, i] = Piece.None;
+                                possibleBoards.Add(tempBoard);
+                            }
                         }
-                        if (j - 2 >= 0 && !board[j - 1, i + 1].HasFlag(player) && board[j - 2, i + 2].HasFlag(Piece.None))
+                        if (player.HasFlag(Piece.MoveUp))
                         {
-                            var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[j - 2, i + 2] = player;
-                            tempBoard[j - 1, i + 1] = Piece.None;
-                            tempBoard[j, i] = Piece.None;
-                            possibleBoards.Add(tempBoard);
-                        }
-                    }
-                    if (player.HasFlag(Piece.MoveUp))
-                    {
-                        if (j + 2 <= board.GetLength(0) - 1 && !board[j + 1, i - 1].HasFlag(player) && board[j + 2, i - 2].HasFlag(Piece.None))
-                        {
-                            var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[j + 2, i - 2] = player;
-                            tempBoard[j + 1, i - 1] = Piece.None;
-                            tempBoard[j, i] = Piece.None;
-                            possibleBoards.Add(tempBoard);
-                        }
-                        if (j - 2 >= 0 && !board[j - 1, i - 1].HasFlag(player) && board[j - 2, i - 2].HasFlag(Piece.None))
-                        {
-                            var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[j - 2, i - 2] = player;
-                            tempBoard[j - 1, i - 1] = Piece.None;
-                            tempBoard[j, i] = Piece.None;
-                            possibleBoards.Add(tempBoard);
+                            if (board[j + 1, i - 1].HasFlag(enemy) && board[j + 2, i - 2].HasFlag(Piece.None))
+                            {
+                                var tempBoard = (Piece[,])board.Clone();
+                                tempBoard[j + 2, i - 2] = player;
+                                tempBoard[j + 1, i - 1] = Piece.None;
+                                tempBoard[j, i] = Piece.None;
+                                possibleBoards.Add(tempBoard);
+                            }
+                            if (board[j - 1, i - 1].HasFlag(enemy) && board[j - 2, i - 2].HasFlag(Piece.None))
+                            {
+                                var tempBoard = (Piece[,])board.Clone();
+                                tempBoard[j - 2, i - 2] = player;
+                                tempBoard[j - 1, i - 1] = Piece.None;
+                                tempBoard[j, i] = Piece.None;
+                                possibleBoards.Add(tempBoard);
+                            }
                         }
                     }
                 }
