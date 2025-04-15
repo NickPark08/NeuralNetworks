@@ -9,6 +9,8 @@ using Piece = MCTSCheckers.CheckersGameState.Piece;
 
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
+using System.Linq;
 
 namespace MCTSCheckers;
 
@@ -76,6 +78,7 @@ public class Game1 : Game
 
         var originalState = new CheckersGameState(originalBoard, redTurn);
         tree.root = new MonteNode(originalState, redTurn);
+        currentPossibleMoves = new List<int[]>();
 
 
         var test = tree.root.State.GetChildren();
@@ -98,30 +101,32 @@ public class Game1 : Game
 
         MouseState ms = Mouse.GetState();
 
+        if ((ms.LeftButton != ButtonState.Pressed || previousMs.LeftButton != ButtonState.Released) || !GraphicsDevice.Viewport.Bounds.Contains(ms.Position)) return;
+
+        int x = ms.X / 100;
+        int y = ms.Y / 100;
+
         if (!redTurn)
         {
-
-            for (int y = 0; y < board.GetLength(0); y++)
+            if (tree.root.State.board[x, y] != Piece.None && !originalBoard[x, y].HasFlag(Piece.Red))
             {
-                for (int x = 0; x < board.GetLength(1); x++)
-                {
-                    if (board[x, y].Contains(ms.X, ms.Y) && ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released && tree.root.State.board[x, y] != Piece.None && !originalBoard[x,y].HasFlag(Piece.Red))
-                    {
-                        currentPossibleMoves = PossibleMoves(x, y);
-                    }
-
-                }
+                currentPossibleMoves = tree.root.State.board[x, y].GetPossibleMoves(tree.root.State.board, x, y).ToList();
+                //foreach (var move in moves)
+                //{
+                //    currentPossibleMoves.Add([x + move[0], y + move[1], x, y]);
+                //}
             }
-            if (currentPossibleMoves != null && currentPossibleMoves.Count != 0)
+
+            else if (currentPossibleMoves.Count != 0)
             {
                 foreach (var pair in currentPossibleMoves)
                 {
-                    if (board[pair[0], pair[1]].Contains(ms.X, ms.Y) && ms.LeftButton == ButtonState.Pressed && previousMs.LeftButton == ButtonState.Released)
+                    if (board[pair[0], pair[1]].Contains(ms.X, ms.Y))
                     {
                         originalBoard = tree.root.State.board;
-                        originalBoard[pair[0], pair[1]] = Piece.BlackPiece;
+                        originalBoard[pair[0], pair[1]] = Piece.BlackPiece; // eventual apply move function
                         originalBoard[pair[2], pair[3]] = Piece.None;
-                        //CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn);
+                        CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn);
                         tree.root.GenerateChildren();
                         foreach (var child in tree.root.Children)
                         {
@@ -151,9 +156,8 @@ public class Game1 : Game
                 }
             }
             redTurn = !redTurn;
-        }
-
             previousMs = ms;
+        }
 
         base.Update(gameTime);
     }
@@ -183,14 +187,14 @@ public class Game1 : Game
                 }
             }
         }
-
-        if (currentPossibleMoves != null)
+        if (currentPossibleMoves.Count != 0)
         {
             foreach (var pair in currentPossibleMoves)
             {
                 spriteBatch.DrawCircle(new(new Vector2(board[pair[0], pair[1]].X + squareSize / 2, board[pair[0], pair[1]].Y + squareSize / 2), 25), 30, Color.Yellow, 25);
             }
         }
+
 
 
 
@@ -204,14 +208,9 @@ public class Game1 : Game
         var currentBoard = tree.root.State.board;
         List<int[]> moves = new List<int[]>();
 
-        if (x + 1 < currentBoard.GetLength(0) && currentBoard[x + 1, y - 1] == Piece.None)
-        {
-            moves.Add([x + 1, y - 1, x, y]);
-        }
-        if (x - 1 > 0 && currentBoard[x - 1, y - 1] == Piece.None)
-        {
-            moves.Add([x - 1, y - 1, x, y]);
-        }
+        var newMoves = currentBoard[x, y].GetPossibleMoves(currentBoard, x, y);
+
+
 
         return moves;
     }

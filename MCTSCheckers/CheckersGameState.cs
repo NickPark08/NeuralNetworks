@@ -22,7 +22,7 @@ namespace MCTSCheckers
             //  111 = 011 | 100
 
             RedPiece = Red | Exists | MoveDown,
-            BlackPiece = Exists | MoveUp, 
+            BlackPiece = Exists | MoveUp,
             King = MoveUp | MoveDown,
 
             RedKing = RedPiece | King,
@@ -45,7 +45,7 @@ namespace MCTSCheckers
             redTurn = turn;
             board = b;
             children = new List<CheckersGameState>();
-            
+
             //change later
             for (int i = 0; i < board.GetLength(0); i++)
             {
@@ -113,118 +113,111 @@ namespace MCTSCheckers
 
         private Piece[][,] PossibleBoards()
         {
-            List<Piece[,]> possibleBoards = [];
-            bool forcedMove = HasForcedMove(ref possibleBoards);
+            List<Piece[,]> possibleBoards = new List<Piece[,]>();
             var player = redTurn ? Piece.RedPiece : Piece.BlackPiece;
 
-            if (!forcedMove)
+            for (int i = 0; i < board.GetLength(1); i++)
             {
-                for (int i = 0; i < board.GetLength(1); i++)
+                for (int j = 0; j < board.GetLength(0); j++)
                 {
-                    for (int j = 0; j < board.GetLength(0); j++)
+                    if (board[j, i] != player) continue;
+
+                    var moves = board[j, i].GetPossibleMoves(board, j, i);
+
+                    void AddPossibleBoard(int x, int y)
                     {
-                        if (board[j, i] != player) continue;
+                        var tempBoard = (Piece[,])board.Clone();
+                        tempBoard[x, y] = player;
+                        tempBoard[j, i] = Piece.None;
+                        possibleBoards.Add(tempBoard);
+                    }
 
-                        int y = redTurn ? i + 1 : i - 1;
-
-                        if (j == board.GetLength(0) - 1)
+                    foreach(var move in moves)
+                    {
+                        if (move[0] != 2 || move[1] != 2)
                         {
-                            ;
+                            AddPossibleBoard(move[0], move[1]);
                         }
-
-                        void AddPossibleBoard(int x, int y)
+                        else
                         {
                             var tempBoard = (Piece[,])board.Clone();
-                            tempBoard[x, y] = player;
+                            tempBoard[move[0], move[1]] = player;
                             tempBoard[j, i] = Piece.None;
+                            //tempBoard[j + (move[0] / 2), i + (move[1] / 2)] = Piece.None;
                             possibleBoards.Add(tempBoard);
                         }
-                        if (y >= 0 && y < board.GetLength(1))
-                        {
-                            if (j + 1 <= board.GetLength(0) - 1 && board[j + 1, y] == Piece.None)
-                            {
-                                AddPossibleBoard(j + 1, y);
-                            }
-                            if (j - 1 >= 0 && board[j - 1, y] == Piece.None)
-                            {
-                                AddPossibleBoard(j - 1, y);
-                            }
-                        }
                     }
+
                 }
             }
-            else
-            {
-                ;
-            }
-                return possibleBoards.ToArray();
+            return possibleBoards.ToArray();
         }
 
-        private bool HasForcedMove(ref List<Piece[,]> possibleBoards)
-        { 
+        //private bool HasForcedMove(ref List<Piece[,]> possibleBoards)
+        //{ 
 
-            for (int i = 0; i < board.GetLength(0); i++)
-            {
-                for (int j = 0; j < board.GetLength(1); j++)
-                {
-                    if (board[j, i] == Piece.None) continue;
+        //    for (int i = 0; i < board.GetLength(0); i++)
+        //    {
+        //        for (int j = 0; j < board.GetLength(1); j++)
+        //        {
+        //            if (board[j, i] == Piece.None) continue;
 
-                    var player = board[j, i];
+        //            var player = board[j, i];
 
-                    var enemy = player.HasFlag(Piece.Red) ? Piece.BlackPiece : Piece.RedPiece;
+        //            var enemy = player.HasFlag(Piece.Red) ? Piece.BlackPiece : Piece.RedPiece;
 
-                    if(j == 2 && i == 3)
-                    {
-                        ;
-                    }
+        //            if(j == 2 && i == 3)
+        //            {
+        //                ;
+        //            }
 
-                    if (j + 2 < board.GetLength(0) && j - 2 >= 0 && i + 2 < board.GetLength(1) && i - 2 >= 0)
-                    {
+        //            if (j + 2 < board.GetLength(0) && j - 2 >= 0 && i + 2 < board.GetLength(1) && i - 2 >= 0)
+        //            {
 
-                        if (player.HasFlag(Piece.MoveDown))
-                        {
-                            if (board[j + 1, i + 1].HasFlag(enemy) && board[j + 2, i + 2].HasFlag(Piece.None))
-                            {
-                                var tempBoard = (Piece[,])board.Clone();
-                                tempBoard[j + 2, i + 2] = player;
-                                tempBoard[j + 1, i + 1] = Piece.None;
-                                tempBoard[j, i] = Piece.None;
-                                possibleBoards.Add(tempBoard);
-                            }
-                            if (board[j - 1, i + 1].HasFlag(enemy) && board[j - 2, i + 2].HasFlag(Piece.None))
-                            {
-                                var tempBoard = (Piece[,])board.Clone();
-                                tempBoard[j - 2, i + 2] = player;
-                                tempBoard[j - 1, i + 1] = Piece.None;
-                                tempBoard[j, i] = Piece.None;
-                                possibleBoards.Add(tempBoard);
-                            }
-                        }
-                        if (player.HasFlag(Piece.MoveUp))
-                        {
-                            if (board[j + 1, i - 1].HasFlag(enemy) && board[j + 2, i - 2].HasFlag(Piece.None))
-                            {
-                                var tempBoard = (Piece[,])board.Clone();
-                                tempBoard[j + 2, i - 2] = player;
-                                tempBoard[j + 1, i - 1] = Piece.None;
-                                tempBoard[j, i] = Piece.None;
-                                possibleBoards.Add(tempBoard);
-                            }
-                            if (board[j - 1, i - 1].HasFlag(enemy) && board[j - 2, i - 2].HasFlag(Piece.None))
-                            {
-                                var tempBoard = (Piece[,])board.Clone();
-                                tempBoard[j - 2, i - 2] = player;
-                                tempBoard[j - 1, i - 1] = Piece.None;
-                                tempBoard[j, i] = Piece.None;
-                                possibleBoards.Add(tempBoard);
-                            }
-                        }
-                    }
-                }
-            }
+        //                if (player.HasFlag(Piece.MoveDown))
+        //                {
+        //                    if (board[j + 1, i + 1].HasFlag(enemy) && board[j + 2, i + 2].HasFlag(Piece.None))
+        //                    {
+        //                        var tempBoard = (Piece[,])board.Clone();
+        //                        tempBoard[j + 2, i + 2] = player;
+        //                        tempBoard[j + 1, i + 1] = Piece.None;
+        //                        tempBoard[j, i] = Piece.None;
+        //                        possibleBoards.Add(tempBoard);
+        //                    }
+        //                    if (board[j - 1, i + 1].HasFlag(enemy) && board[j - 2, i + 2].HasFlag(Piece.None))
+        //                    {
+        //                        var tempBoard = (Piece[,])board.Clone();
+        //                        tempBoard[j - 2, i + 2] = player;
+        //                        tempBoard[j - 1, i + 1] = Piece.None;
+        //                        tempBoard[j, i] = Piece.None;
+        //                        possibleBoards.Add(tempBoard);
+        //                    }
+        //                }
+        //                if (player.HasFlag(Piece.MoveUp))
+        //                {
+        //                    if (board[j + 1, i - 1].HasFlag(enemy) && board[j + 2, i - 2].HasFlag(Piece.None))
+        //                    {
+        //                        var tempBoard = (Piece[,])board.Clone();
+        //                        tempBoard[j + 2, i - 2] = player;
+        //                        tempBoard[j + 1, i - 1] = Piece.None;
+        //                        tempBoard[j, i] = Piece.None;
+        //                        possibleBoards.Add(tempBoard);
+        //                    }
+        //                    if (board[j - 1, i - 1].HasFlag(enemy) && board[j - 2, i - 2].HasFlag(Piece.None))
+        //                    {
+        //                        var tempBoard = (Piece[,])board.Clone();
+        //                        tempBoard[j - 2, i - 2] = player;
+        //                        tempBoard[j - 1, i - 1] = Piece.None;
+        //                        tempBoard[j, i] = Piece.None;
+        //                        possibleBoards.Add(tempBoard);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
 
-            return possibleBoards.Count != 0;
-        }
+        //    return possibleBoards.Count != 0;
+        //}
 
 
     }

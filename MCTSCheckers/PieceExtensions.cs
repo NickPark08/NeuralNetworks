@@ -16,49 +16,65 @@ namespace MCTSCheckers
             //think of smart way to check forced moves
             var enemy = piece.HasFlag(Piece.Red) ? Piece.BlackPiece : Piece.RedPiece;
             List<int[]> moves = new List<int[]>();
-            var forced = false; //(board[x + 1, y + 1].HasFlag(enemy) && board[x + 2, y + 2].HasFlag(Piece.None)) || (board[x - 1, y + 1].HasFlag(enemy) && board[x - 2, y + 2].HasFlag(Piece.None)) || (board[x + 1, y - 1].HasFlag(enemy) && board[x + 2, y - 2].HasFlag(Piece.None)) || (board[x - 1, y - 1].HasFlag(enemy) && board[x - 2, y - 2].HasFlag(Piece.None));
+            var forced = false;
 
-            if (y - 1 >= 0 && y + 1 < board.GetLength(1) && x - 1 >= 0 && x + 1 < board.GetLength(0))
+            if (!forced && y - 2 >= 0 && y + 2 < board.GetLength(1) && x - 2 >= 0 && x + 2 < board.GetLength(0))
             {
-
                 if (piece.HasFlag(Piece.MoveDown))
                 {
-                    if (board[x + 1, y + 1].HasFlag(enemy) && board[x + 2, y + 2].HasFlag(Piece.None))
+                    if (board[x + 1, y + 1].HasFlag(enemy) && board[x + 2, y + 2] == Piece.None)
                     {
-
+                        moves.Add([x + 2, y + 2]);
+                        forced = true;
                     }
-                    else
+                    if (board[x - 1, y + 1].HasFlag(enemy) && board[x - 2, y + 2] == Piece.None)
                     {
-                        if (board[x + 1, y + 1] == Piece.None)
-                        {
-                            moves.Add([1, 1]);
-                        }
-                        if (board[x - 1, y + 1] == Piece.None)
-                        {
-                            moves.Add([-1, 1]);
-                        }
-                    }
-
-                    if (board[x - 1, y + 1].HasFlag(enemy) && board[x - 2, y + 2].HasFlag(Piece.None))
-                    {
-
+                        moves.Add([x - 2, y + 2]);
+                        forced = true;
                     }
                 }
                 if (piece.HasFlag(Piece.MoveUp))
                 {
-                    if (board[x + 1, y - 1].HasFlag(enemy) && board[x + 2, y - 2].HasFlag(Piece.None))
+                    if (board[x + 1, y - 1].HasFlag(enemy) && board[x + 2, y - 2] == Piece.None)
                     {
-
+                        moves.Add([x + 2, y - 2]);
+                        forced = true;
                     }
-                    if (board[x - 1, y - 1].HasFlag(enemy) && board[x - 2, y - 2].HasFlag(Piece.None))
+                    if (board[x - 1, y - 1].HasFlag(enemy) && board[x - 2, y - 2] == Piece.None)
                     {
-
+                        moves.Add([x - 2, y - 2]);
+                        forced = true;
                     }
                 }
             }
 
+            if (!forced && y - 1 >= 0 && y + 1 < board.GetLength(1) && x - 1 >= 0 && x + 1 < board.GetLength(0))
+            {
 
-            return new int[][] { };
+                if (piece.HasFlag(Piece.MoveDown))
+                {
+                    if (board[x + 1, y + 1] == Piece.None)
+                    {
+                        moves.Add([x + 1, x + 1]);
+                    }
+                    if (board[x - 1, y + 1] == Piece.None)
+                    {
+                        moves.Add([x - 1, x + 1]);
+                    }
+                }
+                if (piece.HasFlag(Piece.MoveUp))
+                {
+                    if (board[x + 1, y - 1] == Piece.None)
+                    {
+                        moves.Add([x + 1, x - 1]);
+                    }
+                    if (board[x - 1, y - 1] == Piece.None)
+                    {
+                        moves.Add([x - 1, x - 1]);
+                    }
+                }
+            }
+            return moves.ToArray();
         }
     }
 }
