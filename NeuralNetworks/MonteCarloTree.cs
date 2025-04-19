@@ -71,17 +71,8 @@ namespace NeuralNetworks
 
 
             var orderedKids = root.Children.OrderByDescending(x => x.W / x.N);
-            //if (root.xTurn)
-            //{
-            //    return orderedKids.Last().State;
-            //}
-            //else
-            //{
             return orderedKids.First().State;
-            //}
 
-
-            // check os always win when should be tie
 
         }
 

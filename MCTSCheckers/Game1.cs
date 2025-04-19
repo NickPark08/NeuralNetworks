@@ -111,11 +111,6 @@ public class Game1 : Game
             if (tree.root.State.board[x, y] != Piece.None && !originalBoard[x, y].HasFlag(Piece.Red))
             {
                 currentPossibleMoves = tree.root.State.board[x, y].GetPossibleMoves(tree.root.State.board, x, y).ToList();
-                //foreach (var move in moves)
-                //{
-                //    currentPossibleMoves.Add([x + move[0], y + move[1], x, y]);
-                //}
-
             }
 
             else if (currentPossibleMoves.Count != 0)
@@ -162,6 +157,14 @@ public class Game1 : Game
             var testState = tree.MCTS(100, tree.root.State, random);
             var testNode = new MonteNode(testState, testState.redTurn);
 
+            for(int i = 0; i < board.GetLength(0); i++)
+            {
+                if (testNode.State.board[i, board.GetLength(1) - 1] == Piece.RedPiece)
+                {
+                    testNode.State.board[i, board.GetLength(1) - 1] = Piece.RedKing;
+                }
+            }
+
             foreach (var child in tree.root.State.GetChildren())
             {
                 if (child == testNode.State)
@@ -199,6 +202,10 @@ public class Game1 : Game
                     else if (tree.root.State.board[i, j].HasFlag(Piece.BlackPiece))
                     {
                         spriteBatch.DrawCircle(new(new Vector2(board[i, j].X + squareSize / 2, board[i, j].Y + squareSize / 2), 25), 30, Color.Black, 25);
+                    }
+                    if (tree.root.State.board[i, j].HasFlag(Piece.King))
+                    {
+                        spriteBatch.DrawCircle(new(new Vector2(board[i, j].X + squareSize / 2, board[i, j].Y + squareSize / 2), 25), 30, Color.Gold, 2);
                     }
                 }
             }
