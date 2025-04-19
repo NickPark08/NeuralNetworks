@@ -42,7 +42,7 @@ public class Game1 : Game
         board = new Rectangle[8, 8];
         originalBoard = new Piece[8, 8];
         Size ClientSize = new Size(squareSize * board.GetLength(0), squareSize * board.GetLength(0));
-        previousMs = Mouse.GetState();
+        //previousMs = Mouse.GetState();
         random = new Random();
 
         graphics.PreferredBackBufferWidth = ClientSize.Width;
@@ -115,6 +115,7 @@ public class Game1 : Game
                 //{
                 //    currentPossibleMoves.Add([x + move[0], y + move[1], x, y]);
                 //}
+
             }
 
             else if (currentPossibleMoves.Count != 0)
@@ -124,8 +125,20 @@ public class Game1 : Game
                     if (board[pair[0], pair[1]].Contains(ms.X, ms.Y))
                     {
                         originalBoard = tree.root.State.board;
-                        originalBoard[pair[0], pair[1]] = Piece.BlackPiece; // eventual apply move function
+                        if (pair[1] == 0)
+                        {
+                            originalBoard[pair[0], pair[1]] = Piece.BlackKing; // eventual apply move function
+                        }
+                        else
+                        {
+                            originalBoard[pair[0], pair[1]] = originalBoard[pair[2], pair[3]]; // eventual apply move function
+                        }
                         originalBoard[pair[2], pair[3]] = Piece.None;
+                        if ((pair[0] - pair[2]) % 2 == 0)
+                        {
+                            originalBoard[pair[2] + ((pair[0] - pair[2]) / 2), pair[3] + ((pair[1] - pair[3]) / 2)] = Piece.None;
+                        }
+
                         CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn);
                         tree.root.GenerateChildren();
                         foreach (var child in tree.root.Children)
@@ -135,12 +148,14 @@ public class Game1 : Game
                                 tree.root = child;
                                 currentPossibleMoves.Clear();
                                 redTurn = !redTurn;
+                                //previousMs = ms;
                                 return;
                             }
                         }
                     }
                 }
             }
+
         }
         else
         {
@@ -156,8 +171,9 @@ public class Game1 : Game
                 }
             }
             redTurn = !redTurn;
-            previousMs = ms;
         }
+
+        //previousMs = ms;
 
         base.Update(gameTime);
     }
@@ -176,11 +192,11 @@ public class Game1 : Game
                 {
                     spriteBatch.FillRectangle(board[i, j], Color.DarkGray);
 
-                    if (tree.root.State.board[i, j] == Piece.RedPiece)
+                    if (tree.root.State.board[i, j].HasFlag(Piece.RedPiece))
                     {
                         spriteBatch.DrawCircle(new(new Vector2(board[i, j].X + squareSize / 2, board[i, j].Y + squareSize / 2), 25), 30, Color.Red, 25);
                     }
-                    else if (tree.root.State.board[i, j] == Piece.BlackPiece)
+                    else if (tree.root.State.board[i, j].HasFlag(Piece.BlackPiece))
                     {
                         spriteBatch.DrawCircle(new(new Vector2(board[i, j].X + squareSize / 2, board[i, j].Y + squareSize / 2), 25), 30, Color.Black, 25);
                     }

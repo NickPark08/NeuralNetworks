@@ -79,7 +79,7 @@ namespace MCTSCheckers
                 for (int j = 0; j < board.GetLength(1); j++)
                 {
                     var curr = board[j, i];
-                    result += (" " + (curr == Piece.RedPiece ? 'R' : curr == Piece.BlackPiece ? 'B' : '_'));
+                    result += (" " + (curr.HasFlag(Piece.RedPiece) ? 'R' : curr.HasFlag(Piece.BlackPiece) ? 'B' : '_'));
                 }
                 result += "\n";
             }
@@ -120,13 +120,18 @@ namespace MCTSCheckers
             {
                 for (int j = 0; j < board.GetLength(0); j++)
                 {
-                    if (board[j, i] != player) continue;
+                    if (!board[j, i].HasFlag(player)) continue;
 
                     var moves = board[j, i].GetPossibleMoves(board, j, i);
+
 
                     void AddPossibleBoard(int x, int y)
                     {
                         var tempBoard = (Piece[,])board.Clone();
+                        if(y == 0 || y == board.GetLength(1))
+                        {
+                            player = redTurn ? Piece.RedKing : Piece.BlackKing;
+                        }
                         tempBoard[x, y] = player;
                         tempBoard[j, i] = Piece.None;
                         possibleBoards.Add(tempBoard);
@@ -134,16 +139,21 @@ namespace MCTSCheckers
 
                     foreach(var move in moves)
                     {
-                        if (move[0] != 2 || move[1] != 2)
+                        player = board[move[2], move[3]];
+                        if ((move[0] - move[2]) % 2 != 0 || (move[1] - move[3]) % 2 != 0)
                         {
                             AddPossibleBoard(move[0], move[1]);
                         }
                         else
                         {
                             var tempBoard = (Piece[,])board.Clone();
+                            if (move[1] == 0 || move[1] == board.GetLength(1))
+                            {
+                                player = redTurn ? Piece.RedKing : Piece.BlackKing;
+                            }
                             tempBoard[move[0], move[1]] = player;
                             tempBoard[j, i] = Piece.None;
-                            //tempBoard[j + (move[0] / 2), i + (move[1] / 2)] = Piece.None;
+                            tempBoard[move[2] + ((move[0] - move[2]) / 2), move[3] + ((move[1] - move[3]) / 2)] = Piece.None;
                             possibleBoards.Add(tempBoard);
                         }
                     }
