@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,23 +9,32 @@ using static MCTSCheckers.CheckersGameState;
 
 namespace MCTSCheckers
 {
+    public record Move(Point End, Point Start)
+    {
+        public Move(int endX, int endY, int startX, int startY)
+            : this(new Point(endX, endY), new Point(startX, startY)) { }
+
+        //public int StartX => Start.X; 
+    }
+
+
     public static class PieceExtensions
     {
-        public static int[][] GetPossibleMoves(this Piece piece, Piece[,] board, int x, int y)
+        public static Move[] GetPossibleMoves(this Piece piece, Piece[,] board, int x, int y)
         {
             var enemy = piece.HasFlag(Piece.Red) ? Piece.BlackPiece : Piece.RedPiece;
-            List<int[]> moves = new List<int[]>();
+            List<Move> moves = [];
             var forced = false;
             if (piece.HasFlag(Piece.MoveDown) && y + 2 < board.GetLength(1))
             {
                 if (x + 2 < board.GetLength(0) && board[x + 1, y + 1].HasFlag(enemy) && board[x + 2, y + 2] == Piece.None)
                 {
-                    moves.Add([x + 2, y + 2, x, y]);
+                    moves.Add(new(x + 2, y + 2, x, y));
                     forced = true;
                 }
                 if (x - 2 >= 0 && board[x - 1, y + 1].HasFlag(enemy) && board[x - 2, y + 2] == Piece.None)
                 {
-                    moves.Add([x - 2, y + 2, x, y]);
+                    moves.Add(new(x - 2, y + 2, x, y));
                     forced = true;
                 }
             }
@@ -32,12 +42,12 @@ namespace MCTSCheckers
             {
                 if (x + 2 < board.GetLength(0) && board[x + 1, y - 1].HasFlag(enemy) && board[x + 2, y - 2] == Piece.None)
                 {
-                    moves.Add([x + 2, y - 2, x, y]);
+                    moves.Add(new(x + 2, y - 2, x, y));
                     forced = true;
                 }
                 if (x - 2 >= 0 && board[x - 1, y - 1].HasFlag(enemy) && board[x - 2, y - 2] == Piece.None)
                 {
-                    moves.Add([x - 2, y - 2, x, y]);
+                    moves.Add(new(x - 2, y - 2, x, y));
                     forced = true;
                 }
             }
@@ -49,22 +59,22 @@ namespace MCTSCheckers
                 {
                     if (x + 1 < board.GetLength(0) && board[x + 1, y + 1] == Piece.None)
                     {
-                        moves.Add([x + 1, y + 1, x, y]);
+                        moves.Add(new(x + 1, y + 1, x, y));
                     }
                     if (x - 1 >= 0 && board[x - 1, y + 1] == Piece.None)
                     {
-                        moves.Add([x - 1, y + 1, x, y]);
+                        moves.Add(new(x - 1, y + 1, x, y));
                     }
                 }
                 if (piece.HasFlag(Piece.MoveUp) && y - 1 >= 0)
                 {
                     if (x + 1 < board.GetLength(0) && board[x + 1, y - 1] == Piece.None)
                     {
-                        moves.Add([x + 1, y - 1, x, y]);
+                        moves.Add(new(x + 1, y - 1, x, y));
                     }
                     if (x - 1 >= 0 && board[x - 1, y - 1] == Piece.None)
                     {
-                        moves.Add([x - 1, y - 1, x, y]);
+                        moves.Add(new(x - 1, y - 1, x, y));
                     }
                 }
             }

@@ -25,7 +25,7 @@ public class Game1 : Game
     bool redTurn = false;
     const int squareSize = 100;
     MouseState previousMs;
-    List<int[]> currentPossibleMoves;
+    List<Move> currentPossibleMoves;
     Random random;
 
     public Game1()
@@ -78,7 +78,7 @@ public class Game1 : Game
 
         var originalState = new CheckersGameState(originalBoard, redTurn);
         tree.root = new MonteNode(originalState, redTurn);
-        currentPossibleMoves = new List<int[]>();
+        currentPossibleMoves = [];
 
 
         var test = tree.root.State.GetChildren();
@@ -106,6 +106,12 @@ public class Game1 : Game
         int x = ms.X / 100;
         int y = ms.Y / 100;
 
+
+        if (tree.root.State.IsTerminal)
+        {
+            ;
+        }
+
         if (!redTurn)
         {
             if (tree.root.State.board[x, y] != Piece.None && !originalBoard[x, y].HasFlag(Piece.Red))
@@ -117,21 +123,21 @@ public class Game1 : Game
             {
                 foreach (var pair in currentPossibleMoves)
                 {
-                    if (board[pair[0], pair[1]].Contains(ms.X, ms.Y))
+                    if (board[pair.End.X, pair.End.Y].Contains(ms.X, ms.Y))
                     {
                         originalBoard = tree.root.State.board;
-                        if (pair[1] == 0)
+                        if (pair.End.Y == 0)
                         {
-                            originalBoard[pair[0], pair[1]] = Piece.BlackKing; // eventual apply move function
+                            originalBoard[pair.End.X, pair.End.Y] = Piece.BlackKing; // eventual apply move function
                         }
                         else
                         {
-                            originalBoard[pair[0], pair[1]] = originalBoard[pair[2], pair[3]]; // eventual apply move function
+                            originalBoard[pair.End.X, pair.End.Y] = originalBoard[pair.Start.X, pair.Start.Y]; // eventual apply move function
                         }
-                        originalBoard[pair[2], pair[3]] = Piece.None;
-                        if ((pair[0] - pair[2]) % 2 == 0)
+                        originalBoard[pair.Start.X, pair.Start.Y] = Piece.None;
+                        if ((pair.End.X - pair.Start.X) % 2 == 0)
                         {
-                            originalBoard[pair[2] + ((pair[0] - pair[2]) / 2), pair[3] + ((pair[1] - pair[3]) / 2)] = Piece.None;
+                            originalBoard[pair.Start.X + ((pair.End.X - pair.Start.X) / 2), pair.Start.Y + ((pair.End.Y - pair.Start.Y) / 2)] = Piece.None;
                         }
 
                         CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn);
@@ -151,10 +157,15 @@ public class Game1 : Game
                 }
             }
 
+            if (tree.root.State.IsTerminal)
+            {
+                ;
+            }
+
         }
         else
         {
-            var testState = tree.MCTS(100, tree.root.State, random);
+            var testState = tree.MCTS(50, tree.root.State, random);
             var testNode = new MonteNode(testState, testState.redTurn);
 
             for(int i = 0; i < board.GetLength(0); i++)
@@ -175,8 +186,6 @@ public class Game1 : Game
             }
             redTurn = !redTurn;
         }
-
-        //previousMs = ms;
 
         base.Update(gameTime);
     }
@@ -214,7 +223,7 @@ public class Game1 : Game
         {
             foreach (var pair in currentPossibleMoves)
             {
-                spriteBatch.DrawCircle(new(new Vector2(board[pair[0], pair[1]].X + squareSize / 2, board[pair[0], pair[1]].Y + squareSize / 2), 25), 30, Color.Yellow, 25);
+                spriteBatch.DrawCircle(new(new Vector2(board[pair.End.X, pair.End.Y].X + squareSize / 2, board[pair.End.X, pair.End.Y].Y + squareSize / 2), 25), 30, Color.Yellow, 25);
             }
         }
 
