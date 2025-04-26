@@ -37,11 +37,12 @@ namespace MCTSCheckers
         int blackCount;
         int blackKingCount;
         public bool redTurn;
-        List<CheckersGameState> children;
+        public List<CheckersGameState> children;
 
 
-        public CheckersGameState(Piece[,] b, bool turn)
+        public CheckersGameState(Piece[,] b, bool turn, int move)
         {
+            Move = move;
             redTurn = turn;
             board = b;
             children = new List<CheckersGameState>();
@@ -68,6 +69,11 @@ namespace MCTSCheckers
                     }
                 }
             }
+
+            if (children.Count == 0)
+            {
+                children = GetChildren().ToList();
+            }
         }
 
         public override string ToString()
@@ -89,7 +95,9 @@ namespace MCTSCheckers
 
         public int Value => (redCount + redKingCount) - (blackCount + blackKingCount); //red pieces - black pieces (count for kings)
 
-        public bool IsTerminal => blackCount == 0 || redCount == 0 || GetChildren().Length == 0; //game over, no pieces
+        public bool IsTerminal => blackCount == 0 || redCount == 0 || children.Count == 0 || IsDraw();
+
+        public int Move;
 
         public override bool Equals(object obj)
         {
@@ -102,10 +110,15 @@ namespace MCTSCheckers
 
             for (int i = 0; i < possibleBoards.Length; i++)
             {
-                children.Add(new(possibleBoards[i], !redTurn));
+                children.Add(new(possibleBoards[i], !redTurn, Move+1));
             }
 
             return children.ToArray();
+        }
+
+        private bool IsDraw()
+        {
+            return Move >= 20;
         }
 
         // capturing / "local" function https://sharplab.io/#v2:EYLgHgbALANALiATgVwHYwCYgNQB8ACATAAwCwAUEQIwUX4DMABEYwMIUDeFjPzVEfQozgBTALYAHANzde+fowCWqOIwCSAEUYBeRsRnlejWT3kD8URhoD2AZTjIAZo4AUAShOMuho73uJlAHNGAC8dRgAiAAtFCINfXmVVAENw+niEpRUlcM1sbAyEi0YACUV3TyNvTN95AE4XABIIzRAvRQBfLzDsXQjYxmxGZI6ItyljHxqeZPzC3w7K3iWeUUlB3TKJ5anGRd3PIkJPDmnfFas7B2d3bcmai7WJW8fxZ/GLm3snV3GznZqX2uv3mRnqLgiAFpoTDIWNQbwni9dkYkR9yJ4upkKB0gA==
@@ -138,29 +151,29 @@ namespace MCTSCheckers
 
                     foreach(var move in moves)
                     {
-                        var tempBoard = (Piece[,])board.Clone();
                         player = board[move.Start.X, move.Start.Y];
-                        if ((move.End.X - move.Start.X) % 2 != 0 || (move.End.Y - move.Start.Y) % 2 != 0)
-                        //else if (!forced)
+                        if (!forced && ((move.End.X - move.Start.X) % 2 != 0 || (move.End.Y - move.Start.Y) % 2 != 0))
                         {
+                            var tempBoard = (Piece[,])board.Clone();
                             AddPossibleBoard(move.End.X, move.End.Y, tempBoard);
                         }
 
-                        //if((move.End.X - move.Start.X) % 2 == 0 || (move.End.Y - move.Start.Y) % 2 == 0)
                         else
                         {
-                            if (move.End.Y == 0 || move.End.Y == board.GetLength(1) - 1)
-                            {
-                                player |= Piece.King; //player = redTurn ? Piece.RedKing : Piece.BlackKing;
-                            }
-                            AddPossibleBoard(move.End.X, move.End.Y, tempBoard);
-                            tempBoard[move.Start.X + ((move.End.X - move.Start.X) / 2), move.Start.Y + ((move.End.Y - move.Start.Y) / 2)] = Piece.None;
-
                             if (!forced)
                             {
                                 forced = true;
+                                Move = 0;
                                 possibleBoards.Clear();
                             }
+                            if (move.End.Y == 0 || move.End.Y == board.GetLength(1) - 1)
+                            {
+                                player |= Piece.King;
+                            }
+                            var tempBoard = (Piece[,])board.Clone();
+                            AddPossibleBoard(move.End.X, move.End.Y, tempBoard);
+                            tempBoard[move.Start.X + ((move.End.X - move.Start.X) / 2), move.Start.Y + ((move.End.Y - move.Start.Y) / 2)] = Piece.None;
+
                         }
                     }
 

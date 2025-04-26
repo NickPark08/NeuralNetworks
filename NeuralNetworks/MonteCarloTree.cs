@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace NeuralNetworks
@@ -118,9 +119,12 @@ namespace NeuralNetworks
 
         private static Node Simulation(Node currentNode, Random random)
         {
-
+            int depth = 0;
+            Debug.Write("Loop Start");
             while (!currentNode.State.IsTerminal)
             {
+                depth++;
+                Debug.Write(", " + depth);
                 currentNode.GenerateChildren();
                 if (currentNode.Children.Count == 0)
                 {
@@ -128,7 +132,7 @@ namespace NeuralNetworks
                 }
                 currentNode = currentNode.Children[random.Next(0, currentNode.Children.Count)];
             }
-
+            Debug.WriteLine(depth);
             return currentNode;
             //return currentNode.State.Value;
         }

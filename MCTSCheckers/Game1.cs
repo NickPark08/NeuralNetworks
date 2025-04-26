@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Linq;
+using System.Diagnostics;
 
 namespace MCTSCheckers;
 
@@ -76,7 +77,7 @@ public class Game1 : Game
             }
         }
 
-        var originalState = new CheckersGameState(originalBoard, redTurn);
+        var originalState = new CheckersGameState(originalBoard, redTurn, 0);
         tree.root = new MonteNode(originalState, redTurn);
         currentPossibleMoves = [];
 
@@ -138,9 +139,10 @@ public class Game1 : Game
                         if ((pair.End.X - pair.Start.X) % 2 == 0)
                         {
                             originalBoard[pair.Start.X + ((pair.End.X - pair.Start.X) / 2), pair.Start.Y + ((pair.End.Y - pair.Start.Y) / 2)] = Piece.None;
+                            tree.root.State.Move = 0;
                         }
 
-                        CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn);
+                        CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn, tree.root.State.Move);
                         tree.root.GenerateChildren();
                         foreach (var child in tree.root.Children)
                         {
@@ -165,6 +167,7 @@ public class Game1 : Game
         }
         else
         {
+            Debug.WriteLine("hi");
             var testState = tree.MCTS(50, tree.root.State, random);
             var testNode = new MonteNode(testState, testState.redTurn);
 
@@ -176,7 +179,7 @@ public class Game1 : Game
                 }
             }
 
-            foreach (var child in tree.root.State.GetChildren())
+            foreach (var child in tree.root.State.children)
             {
                 if (child == testNode.State)
                 {
