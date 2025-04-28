@@ -126,7 +126,8 @@ public class Game1 : Game
                 {
                     if (board[pair.End.X, pair.End.Y].Contains(ms.X, ms.Y))
                     {
-                        originalBoard = tree.root.State.board;
+                        originalBoard = CloneBoard(tree.root.State.board);
+
                         if (pair.End.Y == 0)
                         {
                             originalBoard[pair.End.X, pair.End.Y] = Piece.BlackKing; // eventual apply move function
@@ -249,4 +250,14 @@ public class Game1 : Game
 
         return moves;
     }
+
+    private Piece[,] CloneBoard(Piece[,] board)
+    {
+        var newBoard = new Piece[8, 8];
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++)
+                newBoard[i, j] = board[i, j];
+        return newBoard;
+    }
+
 }
