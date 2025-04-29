@@ -13,7 +13,7 @@ namespace NeuralNetworks
 
 
     }
-    public partial class MiniMax<T> where T : IGameState<T>
+    public partial class MiniMax<T> where T : IGameState<T, T[]>
     {
         class MaxComparer : IComparer<Node>
         {
@@ -48,7 +48,6 @@ namespace NeuralNetworks
             {
                 State = state;
                 Value = state.Value;
-                Children = new Node[state.GetChildren().Length];
             }
 
             public override string ToString()
@@ -63,7 +62,6 @@ namespace NeuralNetworks
 
             IComparer<Node> comparer = isMax ? MaxComparer.Instance : MinComparer.Instance;
             var childrenStates = node.State.GetChildren();
-
             node.Children = new Node[childrenStates.Length];
 
             for (int i = 0; i < childrenStates.Length; i++)

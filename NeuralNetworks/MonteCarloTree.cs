@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace NeuralNetworks
 {
-    public class MonteCarloTree<T> where T : IGameState<T>
+    public class MonteCarloTree<T> where T : IGameState<T, T[]>
     {
         public class Node
         {

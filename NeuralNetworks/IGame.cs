@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworks
 {
-    public interface IGameState<T> where T : IGameState<T>
+    public interface IGameState<T, TCollection> where T : IGameState<T, TCollection> where TCollection : IList<T>
     {
         int Value { get; }
         bool IsTerminal { get; }
-        T[] GetChildren();
+        TCollection GetChildren();
     }
 }

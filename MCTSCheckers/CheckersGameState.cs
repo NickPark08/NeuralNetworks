@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MCTSCheckers
 {
-    public class CheckersGameState : IGameState<CheckersGameState>
+    public class CheckersGameState : IGameState<CheckersGameState, List<CheckersGameState>>
     {
         [Flags]//enum (red, black, nothing, king)
         public enum Piece
@@ -69,11 +69,6 @@ namespace MCTSCheckers
                     }
                 }
             }
-
-            if (children.Count == 0)
-            {
-                children = GetChildren().ToList();
-            }
         }
 
         public override string ToString()
@@ -95,7 +90,7 @@ namespace MCTSCheckers
 
         public int Value => (redCount + redKingCount) - (blackCount + blackKingCount); //red pieces - black pieces (count for kings)
 
-        public bool IsTerminal => blackCount == 0 || redCount == 0 || children.Count == 0 || IsDraw();
+        public bool IsTerminal => blackCount == 0 || redCount == 0 || GetChildren().Count == 0 || IsDraw();
 
         public int Move;
 
@@ -104,21 +99,34 @@ namespace MCTSCheckers
             return base.Equals(obj); // 2d equals
         }
 
-        public CheckersGameState[] GetChildren()
+        public List<CheckersGameState> GetChildren()
         {
+            if (children.Count != 0) return children;
+
             var possibleBoards = PossibleBoards();
+
 
             for (int i = 0; i < possibleBoards.Length; i++)
             {
                 children.Add(new(possibleBoards[i], !redTurn, Move+1));
             }
 
-            return children.ToArray();
+            return children;
         }
 
         private bool IsDraw()
         {
             return Move >= 20;
+        }
+
+        private bool IsChildrenEmpty()
+        {
+            if (children.Count == 0)
+            {
+                children = GetChildren().ToList();
+            }
+
+            return children.Count == 0;
         }
 
         // capturing / "local" function https://sharplab.io/#v2:EYLgHgbALANALiATgVwHYwCYgNQB8ACATAAwCwAUEQIwUX4DMABEYwMIUDeFjPzVEfQozgBTALYAHANzde+fowCWqOIwCSAEUYBeRsRnlejWT3kD8URhoD2AZTjIAZo4AUAShOMuho73uJlAHNGAC8dRgAiAAtFCINfXmVVAENw+niEpRUlcM1sbAyEi0YACUV3TyNvTN95AE4XABIIzRAvRQBfLzDsXQjYxmxGZI6ItyljHxqeZPzC3w7K3iWeUUlB3TKJ5anGRd3PIkJPDmnfFas7B2d3bcmai7WJW8fxZ/GLm3snV3GznZqX2uv3mRnqLgiAFpoTDIWNQbwni9dkYkR9yJ4upkKB0gA==

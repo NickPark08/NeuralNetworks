@@ -126,7 +126,7 @@ public class Game1 : Game
                 {
                     if (board[pair.End.X, pair.End.Y].Contains(ms.X, ms.Y))
                     {
-                        originalBoard = CloneBoard(tree.root.State.board);
+                        originalBoard = (Piece[,])tree.root.State.board.Clone();
 
                         if (pair.End.Y == 0)
                         {
@@ -245,19 +245,7 @@ public class Game1 : Game
         List<int[]> moves = new List<int[]>();
 
         var newMoves = currentBoard[x, y].GetPossibleMoves(currentBoard, x, y);
-
-
-
         return moves;
-    }
-
-    private Piece[,] CloneBoard(Piece[,] board)
-    {
-        var newBoard = new Piece[8, 8];
-        for (int i = 0; i < 8; i++)
-            for (int j = 0; j < 8; j++)
-                newBoard[i, j] = board[i, j];
-        return newBoard;
     }
 
 }
