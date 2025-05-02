@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MCTSCheckers
 {
-    public class CheckersGameState : IGameState<CheckersGameState, List<CheckersGameState>>
+    public class CheckersGameState : IGameState<CheckersGameState, CheckersGameState[]>
     {
         [Flags]//enum (red, black, nothing, king)
         public enum Piece
@@ -90,7 +90,7 @@ namespace MCTSCheckers
 
         public int Value => (redCount + redKingCount) - (blackCount + blackKingCount); //red pieces - black pieces (count for kings)
 
-        public bool IsTerminal => blackCount == 0 || redCount == 0 || GetChildren().Count == 0 || IsDraw();
+        public bool IsTerminal => blackCount == 0 || redCount == 0 || GetChildren().Length == 0 || IsDraw();
 
         public int Move;
 
@@ -99,9 +99,9 @@ namespace MCTSCheckers
             return base.Equals(obj); // 2d equals
         }
 
-        public List<CheckersGameState> GetChildren()
+        public CheckersGameState[] GetChildren()
         {
-            if (children.Count != 0) return children;
+            if (children.Count != 0) return children.ToArray();
 
             var possibleBoards = PossibleBoards();
 
@@ -111,7 +111,7 @@ namespace MCTSCheckers
                 children.Add(new(possibleBoards[i], !redTurn, Move+1));
             }
 
-            return children;
+            return children.ToArray();
         }
 
         private bool IsDraw()
