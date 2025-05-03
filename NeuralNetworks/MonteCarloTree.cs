@@ -124,7 +124,7 @@ namespace NeuralNetworks
             while (!currentNode.State.IsTerminal)
             {
                 depth++;
-                Debug.Write(", " + depth);
+                //Debug.Write(", " + depth);
                 currentNode.GenerateChildren();
                 if (currentNode.Children.Count == 0)
                 {
@@ -132,7 +132,7 @@ namespace NeuralNetworks
                 }
                 currentNode = currentNode.Children[random.Next(0, currentNode.Children.Count)];
             }
-            Debug.WriteLine(depth);
+            //Debug.WriteLine(depth);
             return currentNode;
             //return currentNode.State.Value;
         }

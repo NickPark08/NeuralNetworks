@@ -90,7 +90,7 @@ namespace MCTSCheckers
 
         public int Value => (redCount + redKingCount) - (blackCount + blackKingCount); //red pieces - black pieces (count for kings)
 
-        public bool IsTerminal => blackCount == 0 || redCount == 0 || GetChildren().Length == 0 || IsDraw();
+        public bool IsTerminal => (blackCount == 0 && blackKingCount == 0) || (redCount == 0 && redKingCount == 0) || GetChildren().Length == 0 || IsDraw();
 
         public int Move;
 
@@ -166,7 +166,7 @@ namespace MCTSCheckers
                             AddPossibleBoard(move.End.X, move.End.Y, tempBoard);
                         }
 
-                        else
+                        if((move.End.X - move.Start.X) % 2 == 0 && (move.End.Y - move.Start.Y) % 2 == 0)
                         {
                             if (!forced)
                             {
@@ -181,6 +181,7 @@ namespace MCTSCheckers
                             var tempBoard = (Piece[,])board.Clone();
                             AddPossibleBoard(move.End.X, move.End.Y, tempBoard);
                             tempBoard[move.Start.X + ((move.End.X - move.Start.X) / 2), move.Start.Y + ((move.End.Y - move.Start.Y) / 2)] = Piece.None;
+                            var tempState = new CheckersGameState(tempBoard, false, 0);
 
                         }
                     }

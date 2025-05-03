@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Linq;
 using System.Diagnostics;
+using static MCTSCheckers.CheckersGameState;
 
 namespace MCTSCheckers;
 
@@ -102,7 +103,7 @@ public class Game1 : Game
 
         MouseState ms = Mouse.GetState();
 
-        if ((ms.LeftButton != ButtonState.Pressed || previousMs.LeftButton != ButtonState.Released) || !GraphicsDevice.Viewport.Bounds.Contains(ms.Position)) return;
+        if (ms.LeftButton != ButtonState.Pressed || previousMs.LeftButton != ButtonState.Released || !GraphicsDevice.Viewport.Bounds.Contains(ms.Position)) return;
 
         int x = ms.X / 100;
         int y = ms.Y / 100;
@@ -144,6 +145,9 @@ public class Game1 : Game
                         }
 
                         CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn, tree.root.State.Move);
+                        // check for red move being generated even when redTurn is false
+                        // occurs when red turns into a king and has a possible take right after
+                        // tree.root is already expanded, so GenerateChildren doesnt run
                         tree.root.GenerateChildren();
                         foreach (var child in tree.root.Children)
                         {
@@ -152,7 +156,6 @@ public class Game1 : Game
                                 tree.root = child;
                                 currentPossibleMoves.Clear();
                                 redTurn = !redTurn;
-                                //previousMs = ms;
                                 return;
                             }
                         }
@@ -169,7 +172,7 @@ public class Game1 : Game
         else
         {
             Debug.WriteLine("hi");
-            var testState = tree.MCTS(50, tree.root.State, random);
+            var testState = tree.MCTS(100, tree.root.State, random);
             var testNode = new MonteNode(testState, testState.redTurn);
 
             for(int i = 0; i < board.GetLength(0); i++)
@@ -189,6 +192,14 @@ public class Game1 : Game
                 }
             }
             redTurn = !redTurn;
+
+            // now check forced
+            var moves = IsForcedMove(tree.root.State.board);
+            if (moves.Count != 0)
+            {
+                currentPossibleMoves = moves;
+            }
+
         }
 
         base.Update(gameTime);
@@ -231,20 +242,47 @@ public class Game1 : Game
             }
         }
 
-
-
-
         spriteBatch.End();
 
         base.Draw(gameTime);
     }
 
-    public List<int[]> PossibleMoves(int x, int y)
+    public List<Move> IsForcedMove(Piece[,] board)
     {
-        var currentBoard = tree.root.State.board;
-        List<int[]> moves = new List<int[]>();
+        List<Move> moves = new List<Move>();
 
-        var newMoves = currentBoard[x, y].GetPossibleMoves(currentBoard, x, y);
+        for (int y = 0; y < board.GetLength(1); y++)
+        {
+            for (int x = 0; x < board.GetLength(0); x++)
+            {
+                if (board[x, y].HasFlag(Piece.Red)) continue;
+
+                var piece = board[x, y];
+
+                if (piece.HasFlag(Piece.MoveDown) && y + 2 < board.GetLength(1))
+                {
+                    if (x + 2 < board.GetLength(0) && board[x + 1, y + 1].HasFlag(Piece.RedPiece) && board[x + 2, y + 2] == Piece.None)
+                    {
+                        moves.Add(new(x + 2, y + 2, x, y));
+                    }
+                    if (x - 2 >= 0 && board[x - 1, y + 1].HasFlag(Piece.RedPiece) && board[x - 2, y + 2] == Piece.None)
+                    {
+                        moves.Add(new(x - 2, y + 2, x, y));
+                    }
+                }
+                if (piece.HasFlag(Piece.MoveUp) && y - 2 >= 0)
+                {
+                    if (x + 2 < board.GetLength(0) && board[x + 1, y - 1].HasFlag(Piece.RedPiece) && board[x + 2, y - 2] == Piece.None)
+                    {
+                        moves.Add(new(x + 2, y - 2, x, y));
+                    }
+                    if (x - 2 >= 0 && board[x - 1, y - 1].HasFlag(Piece.RedPiece) && board[x - 2, y - 2] == Piece.None)
+                    {
+                        moves.Add(new(x - 2, y - 2, x, y));
+                    }
+                }
+            }
+        }
         return moves;
     }
 
