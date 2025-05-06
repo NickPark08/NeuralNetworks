@@ -25,7 +25,9 @@ namespace MCTSCheckers
             BlackPiece = Exists | MoveUp,
             King = MoveUp | MoveDown,
 
+            //1111
             RedKing = RedPiece | King,
+            //1101
             BlackKing = BlackPiece | King,
 
             None = 0b0000,
@@ -37,15 +39,33 @@ namespace MCTSCheckers
         int blackCount;
         int blackKingCount;
         public bool redTurn;
-        public List<CheckersGameState> children;
 
+        List<CheckersGameState> children;
+        public List<CheckersGameState> LosNiños
+        {
+            get
+            {
+                if (children.Count != 0)
+                {
+                    ;
+                }
+                return children;
+            }
+
+            set
+            {
+                children = value;
+            }
+        }
+
+        public List<CheckersGameState> Kids;
 
         public CheckersGameState(Piece[,] b, bool turn, int move)
         {
             Move = move;
             redTurn = turn;
             board = b;
-            children = new List<CheckersGameState>();
+            Kids = new List<CheckersGameState>();
 
             for (int i = 0; i < board.GetLength(0); i++)
             {
@@ -101,17 +121,17 @@ namespace MCTSCheckers
 
         public CheckersGameState[] GetChildren()
         {
-            if (children.Count != 0) return children.ToArray();
+            if (Kids.Count != 0) return Kids.ToArray();
 
             var possibleBoards = PossibleBoards();
 
 
             for (int i = 0; i < possibleBoards.Length; i++)
             {
-                children.Add(new(possibleBoards[i], !redTurn, Move+1));
+                Kids.Add(new(possibleBoards[i], !redTurn, Move+1));
             }
 
-            return children.ToArray();
+            return Kids.ToArray();
         }
 
         private bool IsDraw()
@@ -121,12 +141,12 @@ namespace MCTSCheckers
 
         private bool IsChildrenEmpty()
         {
-            if (children.Count == 0)
+            if (Kids.Count == 0)
             {
-                children = GetChildren().ToList();
+                Kids = GetChildren().ToList();
             }
 
-            return children.Count == 0;
+            return Kids.Count == 0;
         }
 
         // capturing / "local" function https://sharplab.io/#v2:EYLgHgbALANALiATgVwHYwCYgNQB8ACATAAwCwAUEQIwUX4DMABEYwMIUDeFjPzVEfQozgBTALYAHANzde+fowCWqOIwCSAEUYBeRsRnlejWT3kD8URhoD2AZTjIAZo4AUAShOMuho73uJlAHNGAC8dRgAiAAtFCINfXmVVAENw+niEpRUlcM1sbAyEi0YACUV3TyNvTN95AE4XABIIzRAvRQBfLzDsXQjYxmxGZI6ItyljHxqeZPzC3w7K3iWeUUlB3TKJ5anGRd3PIkJPDmnfFas7B2d3bcmai7WJW8fxZ/GLm3snV3GznZqX2uv3mRnqLgiAFpoTDIWNQbwni9dkYkR9yJ4upkKB0gA==
@@ -181,7 +201,7 @@ namespace MCTSCheckers
                             var tempBoard = (Piece[,])board.Clone();
                             AddPossibleBoard(move.End.X, move.End.Y, tempBoard);
                             tempBoard[move.Start.X + ((move.End.X - move.Start.X) / 2), move.Start.Y + ((move.End.Y - move.Start.Y) / 2)] = Piece.None;
-                            var tempState = new CheckersGameState(tempBoard, false, 0);
+                            //var tempState = new CheckersGameState(tempBoard, false, 0);
 
                         }
                     }

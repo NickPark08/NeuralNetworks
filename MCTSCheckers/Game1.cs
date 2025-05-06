@@ -56,35 +56,37 @@ public class Game1 : Game
             for (int j = 0; j < board.GetLength(1); j++)
             {
                 board[i, j] = new Rectangle(squareSize * i, squareSize * j, squareSize, squareSize);
-                if (i % 2 != j % 2)
-                {
-                    if (j < 3)
-                    {
-                        originalBoard[i, j] = Piece.RedPiece;
-                    }
-                    else if (j > 4)
-                    {
-                        originalBoard[i, j] = Piece.BlackPiece;
-                    }
-                    else
-                    {
-                        originalBoard[i, j] = Piece.None;
-                    }
-                }
-                else
-                {
-                    originalBoard[i, j] = Piece.None;
-                }
+                //if (i % 2 != j % 2)
+                //{
+                //    if (j < 3)
+                //    {
+                //        originalBoard[i, j] = Piece.RedPiece;
+                //    }
+                //    else if (j > 4)
+                //    {
+                //        originalBoard[i, j] = Piece.BlackPiece;
+                //    }
+                //    else
+                //    {
+                //        originalBoard[i, j] = Piece.None;
+                //    }
+                //}
+                //else
+                //{
+                //    originalBoard[i, j] = Piece.None;
+                //}
+                originalBoard[i, j] = Piece.None;
             }
         }
+
+        originalBoard[1, 6] = Piece.BlackPiece;
+        originalBoard[5, 6] = Piece.BlackPiece;
+        //originalBoard[4, 7] = Piece.BlackPiece;
+        originalBoard[3, 6] = Piece.RedPiece;
 
         var originalState = new CheckersGameState(originalBoard, redTurn, 0);
         tree.root = new MonteNode(originalState, redTurn);
         currentPossibleMoves = [];
-
-
-        var test = tree.root.State.GetChildren();
-
 
         base.Initialize();
     }
@@ -183,7 +185,7 @@ public class Game1 : Game
                 }
             }
 
-            foreach (var child in tree.root.State.children)
+            foreach (var child in tree.root.State.LosNiños)
             {
                 if (child == testNode.State)
                 {
@@ -193,7 +195,6 @@ public class Game1 : Game
             }
             redTurn = !redTurn;
 
-            // now check forced
             var moves = IsForcedMove(tree.root.State.board);
             if (moves.Count != 0)
             {
@@ -255,7 +256,7 @@ public class Game1 : Game
         {
             for (int x = 0; x < board.GetLength(0); x++)
             {
-                if (board[x, y].HasFlag(Piece.Red)) continue;
+                if (board[x, y].HasFlag(Piece.Red) || board[x, y] == Piece.None) continue;
 
                 var piece = board[x, y];
 
