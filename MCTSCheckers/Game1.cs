@@ -75,7 +75,7 @@ public class Game1 : Game
                 //{
                 //    originalBoard[i, j] = Piece.None;
                 //}
-                originalBoard[i, j] = Piece.None;
+                originalBoard[i, j] = Piece.None; // comment out if want whole board
             }
         }
 
@@ -83,6 +83,11 @@ public class Game1 : Game
         originalBoard[5, 6] = Piece.BlackPiece;
         //originalBoard[4, 7] = Piece.BlackPiece;
         originalBoard[3, 6] = Piece.RedPiece;
+
+        //originalBoard[1, 6] = Piece.BlackPiece;
+        //originalBoard[2, 5] = Piece.RedPiece;
+        //originalBoard[4, 3] = Piece.RedPiece;
+        ////originalBoard[1, 6] = Piece.RedPiece;
 
         var originalState = new CheckersGameState(originalBoard, redTurn, 0);
         tree.root = new MonteNode(originalState, redTurn);
@@ -149,15 +154,28 @@ public class Game1 : Game
                         CheckersGameState newNode = new CheckersGameState(originalBoard, !redTurn, tree.root.State.Move);
                         // check for red move being generated even when redTurn is false
                         // occurs when red turns into a king and has a possible take right after
-                        // tree.root is already expanded, so GenerateChildren doesnt run
                         tree.root.GenerateChildren();
                         foreach (var child in tree.root.Children)
                         {
                             if (child.State.board.SequenceEquals(originalBoard))
                             {
                                 tree.root = child;
+                                if (Math.Abs(pair.End.X - pair.Start.X) == 2)
+                                {
+                                    currentPossibleMoves = tree.root.State.board[pair.End.X, pair.End.Y].GetPossibleMoves(tree.root.State.board, pair.End.X, pair.End.Y).ToList();
+                                    foreach (var move in currentPossibleMoves)
+                                    {
+                                        if(Math.Abs(move.End.X - move.Start.X) == 2)
+                                        {
+                                            redTurn = !redTurn;
+                                        }
+                                    }
+                                }
                                 currentPossibleMoves.Clear();
-                                redTurn = !redTurn;
+                                redTurn = !redTurn; 
+
+                                tree.root.State.redTurn = redTurn;
+
                                 return;
                             }
                         }
@@ -185,15 +203,17 @@ public class Game1 : Game
                 }
             }
 
-            foreach (var child in tree.root.State.LosNiños)
+            foreach (var child in tree.root.Children)
             {
-                if (child == testNode.State)
+                if (child.State.board.SequenceEquals(testNode.State.board))
                 {
                     tree.root = testNode;
+                    redTurn = !redTurn;
                     break;
                 }
             }
-            redTurn = !redTurn;
+
+            tree.root.State.redTurn = redTurn;
 
             var moves = IsForcedMove(tree.root.State.board);
             if (moves.Count != 0)

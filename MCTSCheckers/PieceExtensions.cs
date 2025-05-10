@@ -21,9 +21,21 @@ namespace MCTSCheckers
     {
         public static Move[] GetPossibleMoves(this Piece piece, Piece[,] board, int x, int y)
         {
+            if(x == 2 && y == 7 && piece == Piece.RedKing)
+            {
+                ;
+                if(piece.HasFlag(Piece.Red))
+                {
+                    ;
+                }
+            }
             var enemy = piece.HasFlag(Piece.Red) ? Piece.BlackPiece : Piece.RedPiece;
+
             List<Move> moves = [];
             var forced = false;
+
+            CheckersGameState test = new(board, false, 0);
+
 
             if (!forced)
             {

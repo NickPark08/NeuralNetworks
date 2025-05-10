@@ -41,22 +41,22 @@ namespace MCTSCheckers
         public bool redTurn;
 
         List<CheckersGameState> children;
-        public List<CheckersGameState> LosNiños
-        {
-            get
-            {
-                if (children.Count != 0)
-                {
-                    ;
-                }
-                return children;
-            }
+        //public List<CheckersGameState> LosNiños
+        //{
+        //    get
+        //    {
+        //        if (children.Count != 0)
+        //        {
+        //            ;
+        //        }
+        //        return children;
+        //    }
 
-            set
-            {
-                children = value;
-            }
-        }
+        //    set
+        //    {
+        //        children = value;
+        //    }
+        //}
 
         public List<CheckersGameState> Kids;
 
@@ -155,14 +155,19 @@ namespace MCTSCheckers
         {
             List<Piece[,]> possibleBoards = [];
             bool forced = false;
+            var player = redTurn ? Piece.Red : Piece.Exists; // change -> redking has flag of blackpiece
 
             for (int i = 0; i < board.GetLength(1); i++)
             {
                 for (int j = 0; j < board.GetLength(0); j++)
                 {
-                    var player = redTurn ? Piece.RedPiece : Piece.BlackPiece;
 
                     if (!board[j, i].HasFlag(player)) continue;
+
+                    if (i == 2 && j == 7 && board[i, j] == Piece.RedPiece && board[4, 5] == Piece.BlackKing) // 2, 7
+                    {
+                        ;
+                    }
 
                     var moves = board[j, i].GetPossibleMoves(board, j, i);
 
