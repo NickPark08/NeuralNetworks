@@ -161,10 +161,11 @@ namespace MCTSCheckers
             {
                 for (int j = 0; j < board.GetLength(0); j++)
                 {
+                    Piece testPlayer = redTurn ? Piece.Red : Piece.None;
+                    var temp = ExactMatch(board[j, i]);
+                    if (ExactMatch(board[j, i]) != testPlayer) continue;
 
-                    if (!board[j, i].HasFlag(player)) continue;
-
-                    if (i == 2 && j == 7 && board[i, j] == Piece.RedPiece && board[4, 5] == Piece.BlackKing) // 2, 7
+                    if (i == 2 && j == 7 && board[i, j] == Piece.RedKing)// && board[4, 5] == Piece.BlackPiece) // 2, 7
                     {
                         ;
                     }
@@ -214,6 +215,11 @@ namespace MCTSCheckers
                 }
             }
             return possibleBoards.ToArray();
+        }
+
+        private Piece ExactMatch (Piece current)
+        {
+            return current & Piece.Red;
         }
 
         public bool Equivalent(object other)

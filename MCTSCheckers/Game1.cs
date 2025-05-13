@@ -79,15 +79,25 @@ public class Game1 : Game
             }
         }
 
-        originalBoard[1, 6] = Piece.BlackPiece;
-        originalBoard[5, 6] = Piece.BlackPiece;
-        //originalBoard[4, 7] = Piece.BlackPiece;
-        originalBoard[3, 6] = Piece.RedPiece;
-
         //originalBoard[1, 6] = Piece.BlackPiece;
-        //originalBoard[2, 5] = Piece.RedPiece;
-        //originalBoard[4, 3] = Piece.RedPiece;
-        ////originalBoard[1, 6] = Piece.RedPiece;
+        //originalBoard[5, 6] = Piece.BlackPiece;
+        //originalBoard[4, 7] = Piece.BlackPiece;
+        ////originalBoard[4, 7] = Piece.BlackPiece;
+        //originalBoard[3, 6] = Piece.RedPiece;
+        //originalBoard[2, 5] = Piece.BlackPiece;
+
+
+        //make it so red takes first then chain capture
+
+        originalBoard[3, 6] = Piece.BlackPiece;
+        originalBoard[2, 7] = Piece.BlackPiece;
+
+        originalBoard[4, 5] = Piece.RedPiece;
+        originalBoard[4, 3] = Piece.RedPiece;
+        originalBoard[7, 4] = Piece.RedPiece;
+        originalBoard[2, 1] = Piece.RedPiece;
+
+
 
         var originalState = new CheckersGameState(originalBoard, redTurn, 0);
         tree.root = new MonteNode(originalState, redTurn);
@@ -165,14 +175,14 @@ public class Game1 : Game
                                     currentPossibleMoves = tree.root.State.board[pair.End.X, pair.End.Y].GetPossibleMoves(tree.root.State.board, pair.End.X, pair.End.Y).ToList();
                                     foreach (var move in currentPossibleMoves)
                                     {
-                                        if(Math.Abs(move.End.X - move.Start.X) == 2)
+                                        if (Math.Abs(move.End.X - move.Start.X) == 2)
                                         {
                                             redTurn = !redTurn;
                                         }
                                     }
                                 }
                                 currentPossibleMoves.Clear();
-                                redTurn = !redTurn; 
+                                redTurn = !redTurn;
 
                                 tree.root.State.redTurn = redTurn;
 
@@ -195,7 +205,7 @@ public class Game1 : Game
             var testState = tree.MCTS(100, tree.root.State, random);
             var testNode = new MonteNode(testState, testState.redTurn);
 
-            for(int i = 0; i < board.GetLength(0); i++)
+            for (int i = 0; i < board.GetLength(0); i++)
             {
                 if (testNode.State.board[i, board.GetLength(1) - 1] == Piece.RedPiece)
                 {
