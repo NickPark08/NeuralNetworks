@@ -39,6 +39,7 @@ namespace MCTSCheckers
         int blackCount;
         int blackKingCount;
         public bool redTurn;
+        bool forced = false;
 
         List<CheckersGameState> children;
         //public List<CheckersGameState> LosNiños
@@ -110,7 +111,7 @@ namespace MCTSCheckers
 
         public int Value => (redCount + redKingCount) - (blackCount + blackKingCount); //red pieces - black pieces (count for kings)
 
-        public bool IsTerminal => (blackCount == 0 && blackKingCount == 0) || (redCount == 0 && redKingCount == 0) || GetChildren().Length == 0 || IsDraw();
+        public bool IsTerminal => (blackCount == 0 && blackKingCount == 0) || (redCount == 0 && redKingCount == 0) || GetChildren(false).Length == 0 || IsDraw();
 
         public int Move;
 
@@ -119,16 +120,15 @@ namespace MCTSCheckers
             return base.Equals(obj); // 2d equals
         }
 
-        public CheckersGameState[] GetChildren()
+        public CheckersGameState[] GetChildren(bool expanded)
         {
             if (Kids.Count != 0) return Kids.ToArray();
 
             var possibleBoards = PossibleBoards();
 
-
             for (int i = 0; i < possibleBoards.Length; i++)
             {
-                Kids.Add(new(possibleBoards[i], !redTurn, Move+1));
+                Kids.Add(new(possibleBoards[i].possibleBoard, possibleBoards[i].forcedTake, Move+1));
             }
 
             return Kids.ToArray();
@@ -143,7 +143,7 @@ namespace MCTSCheckers
         {
             if (Kids.Count == 0)
             {
-                Kids = GetChildren().ToList();
+                Kids = GetChildren(false).ToList();
             }
 
             return Kids.Count == 0;
@@ -151,10 +151,10 @@ namespace MCTSCheckers
 
         // capturing / "local" function https://sharplab.io/#v2:EYLgHgbALANALiATgVwHYwCYgNQB8ACATAAwCwAUEQIwUX4DMABEYwMIUDeFjPzVEfQozgBTALYAHANzde+fowCWqOIwCSAEUYBeRsRnlejWT3kD8URhoD2AZTjIAZo4AUAShOMuho73uJlAHNGAC8dRgAiAAtFCINfXmVVAENw+niEpRUlcM1sbAyEi0YACUV3TyNvTN95AE4XABIIzRAvRQBfLzDsXQjYxmxGZI6ItyljHxqeZPzC3w7K3iWeUUlB3TKJ5anGRd3PIkJPDmnfFas7B2d3bcmai7WJW8fxZ/GLm3snV3GznZqX2uv3mRnqLgiAFpoTDIWNQbwni9dkYkR9yJ4upkKB0gA==
 
-        private Piece[][,] PossibleBoards()
+        private (Piece[,] possibleBoard, bool forcedTake)[] PossibleBoards()
         {
-            List<Piece[,]> possibleBoards = [];
-            bool forced = false;
+            List<(Piece[,] possibleBoard, bool forcedTake)> possibleBoards = [];
+            forced = false;
             var player = redTurn ? Piece.Red : Piece.Exists; // change -> redking has flag of blackpiece
 
             for (int i = 0; i < board.GetLength(1); i++)
@@ -162,17 +162,11 @@ namespace MCTSCheckers
                 for (int j = 0; j < board.GetLength(0); j++)
                 {
                     Piece testPlayer = redTurn ? Piece.Red : Piece.None;
-                    var temp = ExactMatch(board[j, i]);
                     if (ExactMatch(board[j, i]) != testPlayer) continue;
-
-                    if (i == 2 && j == 7 && board[i, j] == Piece.RedKing)// && board[4, 5] == Piece.BlackPiece) // 2, 7
-                    {
-                        ;
-                    }
 
                     var moves = board[j, i].GetPossibleMoves(board, j, i);
 
-                    void AddPossibleBoard(int x, int y, Piece[,] tempBoard)
+                    void AddPossibleBoard(int x, int y, Piece[,] tempBoard, bool forced /* next player's turn */)
                     {
                         if(y == 0 || y == board.GetLength(1) - 1)
                         {
@@ -180,7 +174,7 @@ namespace MCTSCheckers
                         }
                         tempBoard[x, y] = player;
                         tempBoard[j, i] = Piece.None;
-                        possibleBoards.Add(tempBoard);
+                        possibleBoards.Add((tempBoard, forced));
                     }
 
                     foreach(var move in moves)
@@ -189,7 +183,7 @@ namespace MCTSCheckers
                         if (!forced && ((move.End.X - move.Start.X) % 2 != 0 || (move.End.Y - move.Start.Y) % 2 != 0))
                         {
                             var tempBoard = (Piece[,])board.Clone();
-                            AddPossibleBoard(move.End.X, move.End.Y, tempBoard);
+                            AddPossibleBoard(move.End.X, move.End.Y, tempBoard, !redTurn);
                         }
 
                         if((move.End.X - move.Start.X) % 2 == 0 && (move.End.Y - move.Start.Y) % 2 == 0)
@@ -205,9 +199,33 @@ namespace MCTSCheckers
                                 player |= Piece.King;
                             }
                             var tempBoard = (Piece[,])board.Clone();
-                            AddPossibleBoard(move.End.X, move.End.Y, tempBoard);
+                            tempBoard[move.End.X, move.End.Y] = player;
+                            tempBoard[move.Start.X, move.Start.Y] = Piece.None;
                             tempBoard[move.Start.X + ((move.End.X - move.Start.X) / 2), move.Start.Y + ((move.End.Y - move.Start.Y) / 2)] = Piece.None;
-                            //var tempState = new CheckersGameState(tempBoard, false, 0);
+                            var tempstate = new CheckersGameState(tempBoard, false, 0);
+                            var forcedMoves = tempBoard[move.End.X, move.End.Y].GetPossibleMoves(tempBoard, move.End.X, move.End.Y);
+                            bool doubleCapture = false;
+                            foreach (var forcedMove in forcedMoves)
+                            {
+                                if(Math.Abs(forcedMove.Start.X - forcedMove.End.X) == 2)
+                                {
+                                    doubleCapture = true;
+                                }
+                            }
+                            if (doubleCapture)
+                            {
+                                AddPossibleBoard(move.End.X, move.End.Y, tempBoard, redTurn);
+                            }
+                            else
+                            {
+                                tempBoard = (Piece[,])board.Clone();
+                                AddPossibleBoard(move.End.X, move.End.Y, tempBoard, !redTurn);
+                            }
+
+                            tempBoard[move.Start.X + ((move.End.X - move.Start.X) / 2), move.Start.Y + ((move.End.Y - move.Start.Y) / 2)] = Piece.None;
+
+                            // if more captures possible, child state should have those moves forced (next child same turn)
+
 
                         }
                     }

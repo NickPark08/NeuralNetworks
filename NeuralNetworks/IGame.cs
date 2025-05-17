@@ -11,6 +11,6 @@ namespace NeuralNetworks
     {
         int Value { get; }
         bool IsTerminal { get; }
-        TCollection GetChildren();
+        TCollection GetChildren(bool expanded);
     }
 }

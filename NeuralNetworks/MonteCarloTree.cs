@@ -39,7 +39,7 @@ namespace NeuralNetworks
             {
                 if (isExpanded) return;
 
-                var childStates = State.GetChildren();
+                var childStates = State.GetChildren(isExpanded);
                 foreach (var childState in childStates)
                 {
                     Children.Add(new Node(childState, !xTurn, this));

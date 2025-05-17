@@ -89,12 +89,13 @@ public class Game1 : Game
 
         //make it so red takes first then chain capture
 
-        originalBoard[3, 6] = Piece.BlackPiece;
+        originalBoard[4, 7] = Piece.BlackPiece;
         originalBoard[2, 7] = Piece.BlackPiece;
 
         originalBoard[4, 5] = Piece.RedPiece;
         originalBoard[4, 3] = Piece.RedPiece;
         originalBoard[7, 4] = Piece.RedPiece;
+        originalBoard[6, 5] = Piece.BlackPiece;
         originalBoard[2, 1] = Piece.RedPiece;
 
 
@@ -138,7 +139,7 @@ public class Game1 : Game
                 currentPossibleMoves = tree.root.State.board[x, y].GetPossibleMoves(tree.root.State.board, x, y).ToList();
             }
 
-            else if (currentPossibleMoves.Count != 0)
+            if (currentPossibleMoves.Count != 0)
             {
                 foreach (var pair in currentPossibleMoves)
                 {

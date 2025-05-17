@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NeuralNetworks;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -19,17 +20,39 @@ namespace MCTSCheckers
 
     public static class PieceExtensions
     {
+
+
         public static Move[] GetPossibleMoves(this Piece piece, Piece[,] board, int x, int y)
         {
-            CheckersGameState test = new(board, false, 0);
-            if (x == 2 && y == 7 && piece == Piece.RedKing)
+            Piece[,] testBoard = new Piece[8, 8];
+            for(int row = 0; row < board.GetLength(1); row++)
             {
-                ;
-                if (piece.HasFlag(Piece.Red))
+                for(int col = 0; col < board.GetLength(0); col++)
                 {
-                    ;
+                    if ((row == 1 && col == 2) || (row == 3 && col == 4) || (row == 6 && col == 5))
+                    {
+                        testBoard[col, row] = Piece.RedPiece;
+                    }
+                    else if((row == 4 && col == 5) || (row == 7 && col == 2))
+                    {
+                        testBoard[col, row] = Piece.BlackPiece;
+                    }
+                    else
+                    {
+                        testBoard[col, row] = Piece.None;
+                    }
+
                 }
             }
+            CheckersGameState test = new(board, false, 0);
+            CheckersGameState test2 = new(testBoard, false, 0);
+
+
+            if (board.SequenceEquals(testBoard))
+            {
+                ; // breakpoint
+            }
+
             var enemy = piece.HasFlag(Piece.Red) ? Piece.BlackPiece : Piece.RedPiece;
 
             List<Move> moves = [];

@@ -61,7 +61,7 @@ namespace NeuralNetworks
             if (node.State.IsTerminal) return;
 
             IComparer<Node> comparer = isMax ? MaxComparer.Instance : MinComparer.Instance;
-            var childrenStates = node.State.GetChildren();
+            var childrenStates = node.State.GetChildren(false);
             node.Children = new Node[childrenStates.Length];
 
             for (int i = 0; i < childrenStates.Length; i++)
