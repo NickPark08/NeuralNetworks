@@ -136,7 +136,7 @@ namespace MCTSCheckers
 
         private bool IsDraw()
         {
-            return Move >= 20;
+            return Move >= 40;
         }
 
         private bool IsChildrenEmpty()

@@ -120,7 +120,6 @@ namespace NeuralNetworks
         private static Node Simulation(Node currentNode, Random random)
         {
             int depth = 0;
-            Debug.Write("Loop Start");
             while (!currentNode.State.IsTerminal)
             {
                 depth++;

@@ -29,6 +29,7 @@ public class Game1 : Game
     MouseState previousMs;
     List<Move> currentPossibleMoves;
     Random random;
+    bool doubleTake = false;
 
     public Game1()
     {
@@ -56,26 +57,26 @@ public class Game1 : Game
             for (int j = 0; j < board.GetLength(1); j++)
             {
                 board[i, j] = new Rectangle(squareSize * i, squareSize * j, squareSize, squareSize);
-                //if (i % 2 != j % 2)
-                //{
-                //    if (j < 3)
-                //    {
-                //        originalBoard[i, j] = Piece.RedPiece;
-                //    }
-                //    else if (j > 4)
-                //    {
-                //        originalBoard[i, j] = Piece.BlackPiece;
-                //    }
-                //    else
-                //    {
-                //        originalBoard[i, j] = Piece.None;
-                //    }
-                //}
-                //else
-                //{
-                //    originalBoard[i, j] = Piece.None;
-                //}
-                originalBoard[i, j] = Piece.None; // comment out if want whole board
+                if (i % 2 != j % 2)
+                {
+                    if (j < 3)
+                    {
+                        originalBoard[i, j] = Piece.RedPiece;
+                    }
+                    else if (j > 4)
+                    {
+                        originalBoard[i, j] = Piece.BlackPiece;
+                    }
+                    else
+                    {
+                        originalBoard[i, j] = Piece.None;
+                    }
+                }
+                else
+                {
+                    originalBoard[i, j] = Piece.None;
+                }
+                //originalBoard[i, j] = Piece.None; // comment out if want whole board
             }
         }
 
@@ -89,14 +90,14 @@ public class Game1 : Game
 
         //make it so red takes first then chain capture
 
-        originalBoard[4, 7] = Piece.BlackPiece;
-        originalBoard[2, 7] = Piece.BlackPiece;
+        //originalBoard[4, 7] = Piece.BlackPiece;
+        //originalBoard[2, 7] = Piece.BlackPiece;
 
-        originalBoard[4, 5] = Piece.RedPiece;
-        originalBoard[4, 3] = Piece.RedPiece;
-        originalBoard[7, 4] = Piece.RedPiece;
-        originalBoard[6, 5] = Piece.BlackPiece;
-        originalBoard[2, 1] = Piece.RedPiece;
+        //originalBoard[4, 5] = Piece.RedPiece;
+        //originalBoard[4, 3] = Piece.RedPiece;
+        //originalBoard[7, 4] = Piece.RedPiece;
+        //originalBoard[6, 5] = Piece.BlackPiece;
+        //originalBoard[2, 1] = Piece.RedPiece;
 
 
 
@@ -134,6 +135,7 @@ public class Game1 : Game
 
         if (!redTurn)
         {
+            doubleTake = false;
             if (tree.root.State.board[x, y] != Piece.None && !originalBoard[x, y].HasFlag(Piece.Red))
             {
                 currentPossibleMoves = tree.root.State.board[x, y].GetPossibleMoves(tree.root.State.board, x, y).ToList();
@@ -202,7 +204,6 @@ public class Game1 : Game
         }
         else
         {
-            Debug.WriteLine("hi");
             var testState = tree.MCTS(100, tree.root.State, random);
             var testNode = new MonteNode(testState, testState.redTurn);
 
@@ -218,18 +219,40 @@ public class Game1 : Game
             {
                 if (child.State.board.SequenceEquals(testNode.State.board))
                 {
+                    var doubleMoves = IsForcedMove(tree.root.State.board, Piece.Red);
                     tree.root = testNode;
+                    foreach (var move in doubleMoves)
+                    {
+                        var test = tree.root.State.board[move.End.X, move.End.Y].GetPossibleMoves(tree.root.State.board, move.End.X, move.End.Y);
+                        if (test.Length != 0)
+                        {
+                            foreach (var take in test)
+                            {
+                                if (Math.Abs(take.End.X - take.Start.X) != 2) continue;
+
+                                redTurn = !redTurn;
+                                doubleTake = true;
+                            }
+
+                        }
+                    }
                     redTurn = !redTurn;
                     break;
                 }
             }
 
+
+
             tree.root.State.redTurn = redTurn;
 
-            var moves = IsForcedMove(tree.root.State.board);
-            if (moves.Count != 0)
+            //shows forced moves
+            if (!doubleTake)
             {
-                currentPossibleMoves = moves;
+                var moves = IsForcedMove(tree.root.State.board, Piece.None);
+                if (moves.Count != 0)
+                {
+                    currentPossibleMoves = moves;
+                }
             }
 
         }
@@ -279,7 +302,7 @@ public class Game1 : Game
         base.Draw(gameTime);
     }
 
-    public List<Move> IsForcedMove(Piece[,] board)
+    public List<Move> IsForcedMove(Piece[,] board, Piece piecePlayer)
     {
         List<Move> moves = new List<Move>();
 
@@ -287,28 +310,33 @@ public class Game1 : Game
         {
             for (int x = 0; x < board.GetLength(0); x++)
             {
-                if (board[x, y].HasFlag(Piece.Red) || board[x, y] == Piece.None) continue;
+                if ((board[x, y] & Piece.Red) != piecePlayer) continue;
 
                 var piece = board[x, y];
+                var enemy = board[x, y].HasFlag(Piece.Red) ? Piece.BlackPiece : Piece.RedPiece;
+                if (enemy.HasFlag(Piece.King))
+                {
+                    enemy |= Piece.King;
+                }
 
                 if (piece.HasFlag(Piece.MoveDown) && y + 2 < board.GetLength(1))
                 {
-                    if (x + 2 < board.GetLength(0) && board[x + 1, y + 1].HasFlag(Piece.RedPiece) && board[x + 2, y + 2] == Piece.None)
+                    if (x + 2 < board.GetLength(0) && board[x + 1, y + 1].HasFlag(enemy) && board[x + 2, y + 2] == Piece.None)
                     {
                         moves.Add(new(x + 2, y + 2, x, y));
                     }
-                    if (x - 2 >= 0 && board[x - 1, y + 1].HasFlag(Piece.RedPiece) && board[x - 2, y + 2] == Piece.None)
+                    if (x - 2 >= 0 && board[x - 1, y + 1].HasFlag(enemy) && board[x - 2, y + 2] == Piece.None)
                     {
                         moves.Add(new(x - 2, y + 2, x, y));
                     }
                 }
                 if (piece.HasFlag(Piece.MoveUp) && y - 2 >= 0)
                 {
-                    if (x + 2 < board.GetLength(0) && board[x + 1, y - 1].HasFlag(Piece.RedPiece) && board[x + 2, y - 2] == Piece.None)
+                    if (x + 2 < board.GetLength(0) && board[x + 1, y - 1].HasFlag(enemy) && board[x + 2, y - 2] == Piece.None)
                     {
                         moves.Add(new(x + 2, y - 2, x, y));
                     }
-                    if (x - 2 >= 0 && board[x - 1, y - 1].HasFlag(Piece.RedPiece) && board[x - 2, y - 2] == Piece.None)
+                    if (x - 2 >= 0 && board[x - 1, y - 1].HasFlag(enemy) && board[x - 2, y - 2] == Piece.None)
                     {
                         moves.Add(new(x - 2, y - 2, x, y));
                     }
