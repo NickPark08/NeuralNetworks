@@ -10,6 +10,8 @@ public class TriangleArt
     public Bitmap OriginalImage { get; set; }
     public int MaxTriangles { get; set; }
 
+    Bitmap map;
+    Graphics gfx;
     public TriangleArt(int maxTriangles, Bitmap originalImage)
     {
         Triangles = new List<Triangle>();
@@ -48,29 +50,28 @@ public class TriangleArt
 
     public Bitmap DrawImage(int width, int height)
     {
-        Bitmap map = new Bitmap(width, height);
-        using (Graphics gfx = Graphics.FromImage(map))
+        map = new Bitmap(width, height);
+        gfx = Graphics.FromImage(map);
+        gfx.Clear(Color.White);
+        foreach (Triangle t in Triangles)
         {
-            gfx.Clear(Color.White);
-            foreach (Triangle t in Triangles)
-            {
-                t.Draw(gfx, width, height);
-            }
+            t.Draw(gfx, width, height);
         }
+
         return map;
     }
 
     public double GetError()
     {
-        Bitmap current = DrawImage(OriginalImage.Width, OriginalImage.Height));
+        Bitmap current = DrawImage(OriginalImage.Width, OriginalImage.Height);
         double error = 0;
         for (int x = 0; x < current.Width; x++)
         {
             for (int y = 0; y < current.Height; y++)
             {
-                Color c1 = current.GetPixel(x, y);
-                Color c2 = OriginalImage.GetPixel(x, y);
-                error += Math.Pow(c1.R - c2.R, 2) + Math.Pow(c1.G - c2.G, 2) + Math.Pow(c1.B - c2.B, 2);
+                Color color1 = current.GetPixel(x, y);
+                Color color2 = OriginalImage.GetPixel(x, y);
+                error += Math.Pow(color1.R - color2.R, 2) + Math.Pow(color1.G - color2.G, 2) + Math.Pow(color1.B - color2.B, 2);
             }
         }
         return error / (current.Width * current.Height);
@@ -83,5 +84,16 @@ public class TriangleArt
         {
             other.Triangles.Add(t.Copy());
         }
+    }
+
+    public override string ToString()
+    {
+        string data = "";
+        foreach(var t in Triangles)
+        {
+            data += $"Color: {t.Color} -- Points: {t.Points[0]}, {t.Points[1]}, {t.Points[2]}";
+        }
+
+        return data;
     }
 }

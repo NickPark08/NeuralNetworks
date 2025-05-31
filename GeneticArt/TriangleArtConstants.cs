@@ -8,18 +8,18 @@ namespace GeneticArt
 {
     class TriangleArtConstants
     {
-        public static readonly double AddChance = 0.2;
-        public static readonly double RemoveChance = 0.05;
-        public static readonly double MutateChance = 0.75;
-
-        public static readonly float PointMutationRange = 0.05f;
-        public static readonly int ColorMutationRange = 10;
-
-        public static readonly float MinAlpha = 50;
-        public static readonly float MaxAlpha = 200;
-
-        public static readonly float MinPoint = 0f;
-        public static readonly float MaxPoint = 1f;
+        public const double AddChance = 0.4;
+        public const double RemoveChance = 0.05;
+        //public const double MutateChance = 0.75;
+        
+        public const float PointMutationRange = 0.05f;
+        public const int ColorMutationRange = 10;
+          
+        public const float MinAlpha = 50;
+        public const float MaxAlpha = 200;
+              
+        public const float MinPoint = 0f;
+        public const float MaxPoint = 1f;
 
     }
 }

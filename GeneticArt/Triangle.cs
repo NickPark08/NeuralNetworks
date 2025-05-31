@@ -42,10 +42,12 @@ public class Triangle
             bool mutateX = rand.Next(2) == 0;
             if (mutateX)
             {
-                Points[index].X += (float)rand.NextDouble() * (TriangleArtConstants.MaxPoint - -TriangleArtConstants.MaxPoint) + (-TriangleArtConstants.MaxPoint);
+                Points[index].X += (float)rand.NextDouble() * (TriangleArtConstants.MaxPoint + TriangleArtConstants.MaxPoint) + (-TriangleArtConstants.MaxPoint);
             }
             else
-                Points[index].Y += (float)rand.NextDouble() * (TriangleArtConstants.MaxPoint - -TriangleArtConstants.MaxPoint) + (-TriangleArtConstants.MaxPoint);
+            {
+                Points[index].Y += (float)rand.NextDouble() * (TriangleArtConstants.MaxPoint + TriangleArtConstants.MaxPoint) + (-TriangleArtConstants.MaxPoint);
+            }
         }
     }
 
@@ -65,8 +67,7 @@ public class Triangle
                 Math.Clamp(basePoint.Y + (float)(rand.NextDouble() * 0.1 - 0.05), 0, 1)
             );
         }
-        Color color = Color.FromArgb(rand.Next((int)TriangleArtConstants.MinAlpha, (int)TriangleArtConstants.MaxAlpha),
-                                     rand.Next(256), rand.Next(256), rand.Next(256));
+        Color color = Color.FromArgb(rand.Next((int)TriangleArtConstants.MinAlpha, (int)TriangleArtConstants.MaxAlpha), rand.Next(256), rand.Next(256), rand.Next(256));
         return new Triangle(points[0], points[1], points[2], color);
     }
 }

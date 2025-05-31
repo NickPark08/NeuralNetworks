@@ -8,9 +8,31 @@ namespace GeneticArt
     {
 
         GeneticArtTrainer trainer;
+        bool artStarted = false;
+
+
         public Form1()
         {
             InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            trainer = new GeneticArtTrainer(new Bitmap(pictureBox1.Image), 40, 40);
+        }
+
+        private void startButton_Click(object sender, EventArgs e)
+        {
+            artStarted = true;
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if(artStarted)
+            {
+                trainer.Train();
+                pictureBox2.Image = trainer.GetBestImage(pictureBox2.Width,pictureBox2.Height);
+            }
         }
     }
 
