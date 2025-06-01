@@ -50,8 +50,11 @@ public class TriangleArt
 
     public Bitmap DrawImage(int width, int height)
     {
-        map = new Bitmap(width, height);
-        gfx = Graphics.FromImage(map);
+        if (gfx == null)
+        {
+            map = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            gfx = Graphics.FromImage(map);
+        }
         gfx.Clear(Color.White);
         foreach (Triangle t in Triangles)
         {
@@ -61,21 +64,78 @@ public class TriangleArt
         return map;
     }
 
+    //public double GetError()
+    //{
+    //    Bitmap current = DrawImage(OriginalImage.Width, OriginalImage.Height);
+    //    double error = 0;
+    //    for (int x = 0; x < current.Width; x++)
+    //    {
+    //        for (int y = 0; y < current.Height; y++)
+    //        {
+
+
+    //            Color color1 = current.GetPixel(x, y);
+    //            Color color2 = OriginalImage.GetPixel(x, y);
+    //            error += Math.Pow(color1.R - color2.R, 2) + Math.Pow(color1.G - color2.G, 2) + Math.Pow(color1.B - color2.B, 2);
+    //        }
+    //    }
+    //    return error / (current.Width * current.Height);
+    //}
+
+
     public double GetError()
     {
         Bitmap current = DrawImage(OriginalImage.Width, OriginalImage.Height);
         double error = 0;
-        for (int x = 0; x < current.Width; x++)
+        //var originalClone = (Bitmap)OriginalImage.Clone(*
+
+        // Lock both bitmaps
+        Rectangle rect = new Rectangle(0, 0, current.Width, current.Height);
+
+        var bmpDataCurrent = current.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, current.PixelFormat);
+        var bmpDataOriginal = OriginalImage.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, OriginalImage.PixelFormat);
+
+        int strideCurrent = bmpDataCurrent.Stride;
+        int strideOriginal = bmpDataOriginal.Stride;
+
+        int bytesCurrent = Math.Abs(strideCurrent) * current.Height;
+        int bytesOriginal = Math.Abs(strideOriginal) * OriginalImage.Height;
+
+        byte[] rgbValuesCurrent = new byte[bytesCurrent];
+        byte[] rgbValuesOriginal = new byte[bytesOriginal];
+
+        System.Runtime.InteropServices.Marshal.Copy(bmpDataCurrent.Scan0, rgbValuesCurrent, 0, bytesCurrent);
+        System.Runtime.InteropServices.Marshal.Copy(bmpDataOriginal.Scan0, rgbValuesOriginal, 0, bytesOriginal);
+
+        int width = current.Width;
+        int height = current.Height;
+
+        for (int y = 0; y < height; y++)
         {
-            for (int y = 0; y < current.Height; y++)
+            int rowOffsetCurrent = y * strideCurrent;
+            int rowOffsetOriginal = y * strideOriginal;
+
+            for (int x = 0; x < width; x++)
             {
-                Color color1 = current.GetPixel(x, y);
-                Color color2 = OriginalImage.GetPixel(x, y);
-                error += Math.Pow(color1.R - color2.R, 2) + Math.Pow(color1.G - color2.G, 2) + Math.Pow(color1.B - color2.B, 2);
+                int indexCurrent = rowOffsetCurrent + x * 3; // 3 bytes per pixel
+                int indexOriginal = rowOffsetOriginal + x * 3;
+
+                int blueDifference = rgbValuesCurrent[indexCurrent] - rgbValuesOriginal[indexOriginal];
+                int greenDifference = rgbValuesCurrent[indexCurrent + 1] - rgbValuesOriginal[indexOriginal + 1];
+                int redDifference = rgbValuesCurrent[indexCurrent + 2] - rgbValuesOriginal[indexOriginal + 2];
+
+                error += redDifference * redDifference + greenDifference * greenDifference + blueDifference * blueDifference;
             }
         }
-        return error / (current.Width * current.Height);
+
+        current.UnlockBits(bmpDataCurrent);
+        OriginalImage.UnlockBits(bmpDataOriginal);
+
+        return error / (width * height);
     }
+
+
+
 
     public void CopyTo(TriangleArt other)
     {
@@ -86,14 +146,14 @@ public class TriangleArt
         }
     }
 
-    public override string ToString()
-    {
-        string data = "";
-        foreach(var t in Triangles)
-        {
-            data += $"Color: {t.Color} -- Points: {t.Points[0]}, {t.Points[1]}, {t.Points[2]}";
-        }
+    //public override string ToString()
+    //{
+    //    string data = "";
+    //    foreach(var t in Triangles)
+    //    {
+    //        data += $"Color: {t.Color} -- Points: {t.Points[0]}, {t.Points[1]}, {t.Points[2]}";
+    //    }
 
-        return data;
-    }
+    //    return data;
+    //}
 }
