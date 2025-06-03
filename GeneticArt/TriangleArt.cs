@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 public class TriangleArt
 {
@@ -15,7 +16,7 @@ public class TriangleArt
     public TriangleArt(int maxTriangles, Bitmap originalImage)
     {
         Triangles = new List<Triangle>();
-        OriginalImage = originalImage;
+        OriginalImage = originalImage; //(Bitmap)originalImage.Clone();
         MaxTriangles = maxTriangles;
     }
 
@@ -64,23 +65,6 @@ public class TriangleArt
         return map;
     }
 
-    //public double GetError()
-    //{
-    //    Bitmap current = DrawImage(OriginalImage.Width, OriginalImage.Height);
-    //    double error = 0;
-    //    for (int x = 0; x < current.Width; x++)
-    //    {
-    //        for (int y = 0; y < current.Height; y++)
-    //        {
-
-
-    //            Color color1 = current.GetPixel(x, y);
-    //            Color color2 = OriginalImage.GetPixel(x, y);
-    //            error += Math.Pow(color1.R - color2.R, 2) + Math.Pow(color1.G - color2.G, 2) + Math.Pow(color1.B - color2.B, 2);
-    //        }
-    //    }
-    //    return error / (current.Width * current.Height);
-    //}
 
 
     public double GetError()
@@ -92,11 +76,11 @@ public class TriangleArt
         // Lock both bitmaps
         Rectangle rect = new Rectangle(0, 0, current.Width, current.Height);
 
-        var bmpDataCurrent = current.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, current.PixelFormat);
-        var bmpDataOriginal = OriginalImage.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, OriginalImage.PixelFormat);
+        var currentBitmap = current.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, current.PixelFormat);
+        var originalBitmap = OriginalImage.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, OriginalImage.PixelFormat);
 
-        int strideCurrent = bmpDataCurrent.Stride;
-        int strideOriginal = bmpDataOriginal.Stride;
+        int strideCurrent = currentBitmap.Stride;
+        int strideOriginal = originalBitmap.Stride;
 
         int bytesCurrent = Math.Abs(strideCurrent) * current.Height;
         int bytesOriginal = Math.Abs(strideOriginal) * OriginalImage.Height;
@@ -104,8 +88,8 @@ public class TriangleArt
         byte[] rgbValuesCurrent = new byte[bytesCurrent];
         byte[] rgbValuesOriginal = new byte[bytesOriginal];
 
-        System.Runtime.InteropServices.Marshal.Copy(bmpDataCurrent.Scan0, rgbValuesCurrent, 0, bytesCurrent);
-        System.Runtime.InteropServices.Marshal.Copy(bmpDataOriginal.Scan0, rgbValuesOriginal, 0, bytesOriginal);
+        System.Runtime.InteropServices.Marshal.Copy(currentBitmap.Scan0, rgbValuesCurrent, 0, bytesCurrent);
+        System.Runtime.InteropServices.Marshal.Copy(originalBitmap.Scan0, rgbValuesOriginal, 0, bytesOriginal);
 
         int width = current.Width;
         int height = current.Height;
@@ -128,11 +112,65 @@ public class TriangleArt
             }
         }
 
-        current.UnlockBits(bmpDataCurrent);
-        OriginalImage.UnlockBits(bmpDataOriginal);
+        current.UnlockBits(currentBitmap);
+        OriginalImage.UnlockBits(originalBitmap);
 
         return error / (width * height);
     }
+
+
+    //public double GetError()
+    //{
+    //    Bitmap current = DrawImage(OriginalImage.Width, OriginalImage.Height);
+    //    Bitmap originalClone = (Bitmap)OriginalImage.Clone();
+    //    double error = 0;
+    //    Rectangle rect = new Rectangle(0, 0, current.Width, current.Height);
+
+    //    var currentBitmap = current.LockBits(rect, ImageLockMode.ReadOnly, current.PixelFormat);
+    //    var originalBitmap = originalClone.LockBits(rect, ImageLockMode.ReadOnly, originalClone.PixelFormat);
+
+    //    int strideCurrent = currentBitmap.Stride;
+    //    int strideOriginal = originalBitmap.Stride;
+
+    //    int bytesCurrent = Math.Abs(strideCurrent) * current.Height;
+    //    int bytesOriginal = Math.Abs(strideOriginal) * originalClone.Height;
+
+    //    byte[] rgbValuesCurrent = new byte[bytesCurrent];
+    //    byte[] rgbValuesOriginal = new byte[bytesOriginal];
+
+    //    System.Runtime.InteropServices.Marshal.Copy(currentBitmap.Scan0, rgbValuesCurrent, 0, bytesCurrent);
+    //    System.Runtime.InteropServices.Marshal.Copy(originalBitmap.Scan0, rgbValuesOriginal, 0, bytesOriginal);
+
+    //    int width = current.Width;
+    //    int height = current.Height;
+
+    //    for (int y = 0; y < height; y++)
+    //    {
+    //        int rowOffsetCurrent = y * strideCurrent;
+    //        int rowOffsetOriginal = y * strideOriginal;
+
+    //        for (int x = 0; x < width; x++)
+    //        {
+    //            int indexCurrent = rowOffsetCurrent + x * 3;
+    //            int indexOriginal = rowOffsetOriginal + x * 3;
+
+    //            int blueDifference = rgbValuesCurrent[indexCurrent] - rgbValuesOriginal[indexOriginal];
+    //            int greenDifference = rgbValuesCurrent[indexCurrent + 1] - rgbValuesOriginal[indexOriginal + 1];
+    //            int redDifference = rgbValuesCurrent[indexCurrent + 2] - rgbValuesOriginal[indexOriginal + 2];
+
+    //            error += redDifference * redDifference + greenDifference * greenDifference + blueDifference * blueDifference;
+    //        }
+    //    }
+
+    //    current.UnlockBits(currentBitmap);
+    //    originalClone.UnlockBits(originalBitmap);
+
+    //    current.Dispose();
+    //    originalClone.Dispose();
+        
+    //    return error / (width * height);
+    //}
+
 
 
 

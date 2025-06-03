@@ -5,6 +5,7 @@ public class GeneticArtTrainer
 {
     public TriangleArt[] Population;
     private Random Rand = new Random();
+    double bestError = double.MaxValue;
 
     public GeneticArtTrainer(Bitmap original, int maxTriangles, int populationSize)
     {
@@ -42,47 +43,59 @@ public class GeneticArtTrainer
         return bestError;
     }
 
-    public double ParallelTrain(Random rand)
+    //public double ParallelTrain(Random rand)
+    //{
+    //    double[] errors = new double[Population.Length];
+
+    //    Parallel.For(1, Population.Length, (i) =>
+    //    {
+    //        Population[0].CopyTo(Population[i]);
+    //        Population[i].Mutate(rand);
+    //        errors[i] = Population[i].GetError();
+    //    });
+
+    //    int bestIndex = 0;
+    //    for (int i = 1; i < errors.Length; i++)
+    //    {
+    //        if (errors[i] < bestError)
+    //        {
+    //            bestIndex = i;
+    //            bestError = errors[i];
+    //        }
+    //    }
+    //    TriangleArt temp = Population[0];
+    //    Population[0] = Population[bestIndex];
+    //    Population[bestIndex] = temp;
+    //    return bestError;
+    //}
+    public double ParallelTrain(Random random)
     {
-        double bestError = double.MaxValue;
-        int bestIndex = 0;
-
-        // Create a thread-local Random generator for thread safety
-        //ThreadLocal<Random> threadLocalRand = new ThreadLocal<Random>(() =>
-        //{
-        //    return new Random(Guid.NewGuid().GetHashCode());
-        //});
-
         double[] errors = new double[Population.Length];
 
-        // Copy Population[0] to all others before mutating in parallel
         Parallel.For(1, Population.Length, i =>
         {
-            //var rand = threadLocalRand.Value;
-
-            // Copy base solution to this individual
             Population[0].CopyTo(Population[i]);
-
-            // Mutate this individual
-            Population[i].Mutate(rand);
-
-            // Compute error
-            double error = Population[i].GetError();
-
-            errors[i] = error;
+            Population[i].Mutate(random);
+            errors[i] = Population[i].GetError();
         });
 
-        // Find best error and index in main thread
-        for (int i = 1; i < Population.Length; i++)
+        int bestIndex = 0;
+        double error = double.MaxValue;
+
+        for (int i = 1; i < errors.Length; i++)
         {
-            if (errors[i] < bestError)
+            if (errors[i] < error)
             {
-                bestError = errors[i];
+                error = errors[i];
                 bestIndex = i;
             }
         }
 
-        // Swap best with index 0 if needed
+        if (error < bestError)
+        {
+            bestError = error;
+        }
+
         if (bestIndex != 0)
         {
             var temp = Population[0];
@@ -92,6 +105,7 @@ public class GeneticArtTrainer
 
         return bestError;
     }
+
 
     public Bitmap GetBestImage(int width, int height)
     {

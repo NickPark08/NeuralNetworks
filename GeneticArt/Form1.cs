@@ -34,7 +34,7 @@ namespace GeneticArt
             {
                 trainer.Train();
                 //trainer.ParallelTrain(random);
-                pictureBox2.Image = trainer.GetBestImage(pictureBox2.Width,pictureBox2.Height);
+                pictureBox2.Image = trainer.GetBestImage(pictureBox2.Width, pictureBox2.Height);
             }
         }
     }
